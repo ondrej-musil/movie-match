@@ -123,7 +123,7 @@ export default function SwipeScreen() {
       </View>
 
       {/* Movie Cards */}
-      <View className="flex-1 items-center justify-center px-5">
+      <View className="flex-1 items-center justify-start px-5 pt-4">
         {currentMovie ? (
           <MovieCard
             movie={currentMovie}
@@ -179,7 +179,7 @@ export default function SwipeScreen() {
 
       {/* Instructions */}
       {currentMovie && (
-        <View className="px-6 pb-4">
+        <View className="px-6 pb-8">
           <Text className="text-gray-400 text-center text-sm">
             Swipe ❤️ to like • ✕ to pass
           </Text>
