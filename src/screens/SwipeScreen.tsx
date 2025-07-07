@@ -57,11 +57,11 @@ export default function SwipeScreen() {
 
   const handleLeaveRoom = () => {
     Alert.alert(
-      'Leave Room',
-      'Are you sure you want to leave this room?',
+      'Back to Main Menu',
+      'Are you sure you want to leave this room and return to the main menu?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Leave', style: 'destructive', onPress: leaveRoom }
+        { text: 'Leave Room', style: 'destructive', onPress: leaveRoom }
       ]
     );
   };
@@ -82,9 +82,18 @@ export default function SwipeScreen() {
     <SafeAreaView className="flex-1 bg-gray-900">
       {/* Header */}
       <View className="flex-row items-center justify-between px-6 py-4">
-        <View className="flex-row items-center">
-          <Ionicons name="people-outline" size={24} color="#9ca3af" />
-          <Text className="text-gray-400 ml-2">{currentRoom.users.length} players</Text>
+        <View className="flex-row items-center space-x-4">
+          <Pressable
+            onPress={handleLeaveRoom}
+            className="bg-gray-700 rounded-full p-2 flex-row items-center space-x-2"
+          >
+            <Ionicons name="arrow-back" size={20} color="white" />
+          </Pressable>
+          
+          <View className="flex-row items-center">
+            <Ionicons name="people-outline" size={24} color="#9ca3af" />
+            <Text className="text-gray-400 ml-2">{currentRoom.users.length} players</Text>
+          </View>
         </View>
         
         <View className="flex-row items-center space-x-4">
@@ -94,13 +103,6 @@ export default function SwipeScreen() {
           >
             <Ionicons name="heart" size={16} color="white" />
             <Text className="text-white font-medium">{matches.length}</Text>
-          </Pressable>
-          
-          <Pressable
-            onPress={handleLeaveRoom}
-            className="bg-red-600 rounded-full p-2"
-          >
-            <Ionicons name="close" size={20} color="white" />
           </Pressable>
         </View>
       </View>
