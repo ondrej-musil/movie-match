@@ -4,6 +4,15 @@ import { Image } from 'expo-image';
 import { Movie } from '../types/movie';
 import { Ionicons } from '@expo/vector-icons';
 import { cn } from '../utils/cn';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  runOnJS,
+  interpolate,
+} from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 
 interface MovieCardProps {
   movie: Movie;
@@ -16,29 +25,163 @@ const CARD_WIDTH = width - 40;
 const CARD_HEIGHT = height * 0.65; // Use 65% of screen height to leave room for buttons
 
 export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps) {
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const scale = useSharedValue(1);
+
+  const SWIPE_THRESHOLD = width * 0.25;
+
+  const handleSwipeComplete = (liked: boolean) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onSwipe(liked);
+  };
+
+  const handleButtonPress = (liked: boolean) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // Animate the card off screen
+    if (liked) {
+      translateX.value = withSpring(width * 1.5, { damping: 15 });
+    } else {
+      translateX.value = withSpring(-width * 1.5, { damping: 15 });
+    }
+    setTimeout(() => {
+      onSwipe(liked);
+    }, 200);
+  };
+
+  const panGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      translateX.value = event.translationX;
+      translateY.value = event.translationY * 0.1; // Minimal vertical movement
+      
+      // Scale down slightly while dragging
+      const distance = Math.abs(event.translationX);
+      scale.value = interpolate(
+        distance,
+        [0, SWIPE_THRESHOLD],
+        [1, 0.95],
+        'clamp'
+      );
+    })
+    .onEnd((event) => {
+      const shouldSwipeRight = event.translationX > SWIPE_THRESHOLD;
+      const shouldSwipeLeft = event.translationX < -SWIPE_THRESHOLD;
+
+      if (shouldSwipeRight) {
+        // Swipe right - Like
+        translateX.value = withSpring(width * 1.5, { damping: 15, stiffness: 100 });
+        runOnJS(handleSwipeComplete)(true);
+      } else if (shouldSwipeLeft) {
+        // Swipe left - Pass
+        translateX.value = withSpring(-width * 1.5, { damping: 15, stiffness: 100 });
+        runOnJS(handleSwipeComplete)(false);
+      } else {
+        // Spring back to center
+        translateX.value = withSpring(0, { damping: 20, stiffness: 150 });
+        translateY.value = withSpring(0, { damping: 20, stiffness: 150 });
+        scale.value = withSpring(1, { damping: 20, stiffness: 150 });
+      }
+    });
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const rotate = interpolate(
+      translateX.value,
+      [-width, width],
+      [-30, 30],
+      'clamp'
+    );
+
+    return {
+      transform: [
+        { translateX: translateX.value },
+        { translateY: translateY.value },
+        { scale: scale.value },
+        { rotateZ: `${rotate}deg` }
+      ],
+    };
+  });
+
+  const likeOpacityStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      translateX.value,
+      [0, SWIPE_THRESHOLD],
+      [0, 1],
+      'clamp'
+    ),
+  }));
+
+  const passOpacityStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      translateX.value,
+      [-SWIPE_THRESHOLD, 0],
+      [1, 0],
+      'clamp'
+    ),
+  }));
+
+  const cardBackgroundStyle = useAnimatedStyle(() => {
+    const backgroundColor = interpolate(
+      translateX.value,
+      [-SWIPE_THRESHOLD, 0, SWIPE_THRESHOLD],
+      [0.1, 0, 0.1], // Red tint when swiping left, green tint when swiping right
+      'clamp'
+    );
+    
+    return {
+      backgroundColor: translateX.value < 0 
+        ? `rgba(239, 68, 68, ${backgroundColor})` // Red tint
+        : `rgba(34, 197, 94, ${backgroundColor})` // Green tint
+    };
+  });
+
   return (
-    <View 
-      className={cn(
-        "absolute bg-gray-800 rounded-2xl overflow-hidden shadow-2xl",
-        isVisible ? "opacity-100" : "opacity-0"
-      )}
-      style={{ width: CARD_WIDTH, height: CARD_HEIGHT }}
-    >
-      {/* Movie Poster */}
-      <View className="relative">
-        <Image
-          source={{ uri: movie.poster }}
-          style={{ width: CARD_WIDTH, height: CARD_HEIGHT * 0.6 }}
-          contentFit="cover"
-          transition={300}
+    <GestureDetector gesture={panGesture}>
+      <Animated.View 
+        className={cn(
+          "absolute rounded-2xl overflow-hidden shadow-2xl",
+          isVisible ? "opacity-100" : "opacity-0"
+        )}
+        style={[{ width: CARD_WIDTH, height: CARD_HEIGHT }, animatedStyle]}
+      >
+        <Animated.View 
+          className="absolute inset-0 bg-gray-800 rounded-2xl"
+          style={cardBackgroundStyle} 
         />
-        
-        {/* Rating Badge */}
-        <View className="absolute top-4 right-4 bg-yellow-500 rounded-full px-3 py-1 flex-row items-center">
-          <Ionicons name="star" size={16} color="white" />
-          <Text className="text-white font-bold ml-1">{movie.rating}</Text>
+        <View className="flex-1 bg-gray-800 rounded-2xl">
+        {/* Movie Poster */}
+        <View className="relative">
+          <Image
+            source={{ uri: movie.poster }}
+            style={{ width: CARD_WIDTH, height: CARD_HEIGHT * 0.6 }}
+            contentFit="cover"
+            transition={300}
+          />
+          
+          {/* Rating Badge */}
+          <View className="absolute top-4 right-4 bg-yellow-500 rounded-full px-3 py-1 flex-row items-center">
+            <Ionicons name="star" size={16} color="white" />
+            <Text className="text-white font-bold ml-1">{movie.rating}</Text>
+          </View>
+
+          {/* Swipe Indicators */}
+          <Animated.View 
+            className="absolute inset-0 items-center justify-center"
+            style={likeOpacityStyle}
+          >
+            <View className="bg-green-500 rounded-full p-4 rotate-12">
+              <Ionicons name="heart" size={48} color="white" />
+            </View>
+          </Animated.View>
+
+          <Animated.View 
+            className="absolute inset-0 items-center justify-center"
+            style={passOpacityStyle}
+          >
+            <View className="bg-red-500 rounded-full p-4 -rotate-12">
+              <Ionicons name="close" size={48} color="white" />
+            </View>
+          </Animated.View>
         </View>
-      </View>
 
       {/* Movie Details */}
       <View className="p-4 flex-1 justify-between">
@@ -69,20 +212,22 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
         {/* Action Buttons */}
         <View className="flex-row justify-center space-x-8 mt-4">
           <Pressable
-            onPress={() => onSwipe(false)}
+            onPress={() => handleButtonPress(false)}
             className="bg-red-600 rounded-full w-14 h-14 items-center justify-center"
           >
             <Ionicons name="close" size={28} color="white" />
           </Pressable>
           
           <Pressable
-            onPress={() => onSwipe(true)}
+            onPress={() => handleButtonPress(true)}
             className="bg-green-600 rounded-full w-14 h-14 items-center justify-center"
           >
             <Ionicons name="heart" size={28} color="white" />
           </Pressable>
         </View>
-      </View>
-    </View>
+        </View>
+        </View>
+      </Animated.View>
+    </GestureDetector>
   );
 }

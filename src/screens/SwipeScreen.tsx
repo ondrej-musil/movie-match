@@ -180,8 +180,18 @@ export default function SwipeScreen() {
       {/* Instructions */}
       {currentMovie && (
         <View className="px-6 pb-8">
-          <Text className="text-gray-400 text-center text-sm">
-            Swipe ❤️ to like • ✕ to pass
+          <View className="flex-row items-center justify-center space-x-6 mb-2">
+            <View className="flex-row items-center">
+              <Text className="text-red-400 text-lg mr-2">←</Text>
+              <Text className="text-gray-400 text-sm">Swipe left to pass</Text>
+            </View>
+            <View className="flex-row items-center">
+              <Text className="text-gray-400 text-sm">Swipe right to like</Text>
+              <Text className="text-green-400 text-lg ml-2">→</Text>
+            </View>
+          </View>
+          <Text className="text-gray-500 text-center text-xs">
+            Or use the buttons below
           </Text>
         </View>
       )}
