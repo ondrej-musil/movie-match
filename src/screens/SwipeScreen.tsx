@@ -7,6 +7,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { useMovieMatchStore } from '../state/movieMatchStore';
 import { Ionicons } from '@expo/vector-icons';
 import MovieCard from '../components/MovieCard';
+import * as Haptics from 'expo-haptics';
 
 type SwipeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Swipe'>;
 
@@ -46,6 +47,7 @@ export default function SwipeScreen() {
   const handleSwipe = (liked: boolean) => {
     if (!currentMovie) return;
 
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     swipeMovie(currentMovie.id, liked);
     
     if (!isLastMovie) {
@@ -179,6 +181,27 @@ export default function SwipeScreen() {
         </View>
       )}
 
+      {/* Action Buttons */}
+      {currentMovie && (
+        <View className="px-6 pb-4">
+          <View className="flex-row justify-center space-x-8 mb-4">
+            <Pressable
+              onPress={() => handleSwipe(false)}
+              className="bg-red-600 rounded-full w-16 h-16 items-center justify-center"
+            >
+              <Ionicons name="close" size={32} color="white" />
+            </Pressable>
+            
+            <Pressable
+              onPress={() => handleSwipe(true)}
+              className="bg-green-600 rounded-full w-16 h-16 items-center justify-center"
+            >
+              <Ionicons name="heart" size={32} color="white" />
+            </Pressable>
+          </View>
+        </View>
+      )}
+
       {/* Instructions */}
       {currentMovie && (
         <View className="px-6 pb-8">
@@ -192,7 +215,6 @@ export default function SwipeScreen() {
               <Text className="text-green-400 text-lg ml-2">→</Text>
             </View>
           </View>
-
         </View>
       )}
     </SafeAreaView>

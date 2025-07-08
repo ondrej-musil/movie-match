@@ -43,25 +43,7 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
     onSwipe(liked);
   };
 
-  const handleButtonPress = (liked: boolean) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // Animate the card off screen
-    if (liked) {
-      translateX.value = withSpring(width * 1.5, { 
-        damping: 15, 
-        stiffness: 100 
-      }, () => {
-        runOnJS(handleSwipeComplete)(true);
-      });
-    } else {
-      translateX.value = withSpring(-width * 1.5, { 
-        damping: 15, 
-        stiffness: 100 
-      }, () => {
-        runOnJS(handleSwipeComplete)(false);
-      });
-    }
-  };
+
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
@@ -231,22 +213,7 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
           </Text>
         </View>
 
-        {/* Action Buttons */}
-        <View className="flex-row justify-center space-x-8 mt-4">
-          <Pressable
-            onPress={() => handleButtonPress(false)}
-            className="bg-red-600 rounded-full w-14 h-14 items-center justify-center"
-          >
-            <Ionicons name="close" size={28} color="white" />
-          </Pressable>
-          
-          <Pressable
-            onPress={() => handleButtonPress(true)}
-            className="bg-green-600 rounded-full w-14 h-14 items-center justify-center"
-          >
-            <Ionicons name="heart" size={28} color="white" />
-          </Pressable>
-        </View>
+
         </View>
         </View>
       </Animated.View>
