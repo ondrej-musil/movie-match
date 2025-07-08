@@ -124,17 +124,27 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
   }));
 
   const cardBackgroundStyle = useAnimatedStyle(() => {
-    const backgroundColor = interpolate(
-      translateX.value,
-      [-SWIPE_THRESHOLD, 0, SWIPE_THRESHOLD],
-      [0.1, 0, 0.1], // Red tint when swiping left, green tint when swiping right
+    const intensity = interpolate(
+      Math.abs(translateX.value),
+      [0, SWIPE_THRESHOLD],
+      [0, 0.3], // Increase opacity for more visible color
       'clamp'
     );
     
+    if (translateX.value > 10) {
+      // Swiping right - green tint
+      return {
+        backgroundColor: `rgba(34, 197, 94, ${intensity})` // Green
+      };
+    } else if (translateX.value < -10) {
+      // Swiping left - red tint
+      return {
+        backgroundColor: `rgba(239, 68, 68, ${intensity})` // Red
+      };
+    }
+    
     return {
-      backgroundColor: translateX.value < 0 
-        ? `rgba(239, 68, 68, ${backgroundColor})` // Red tint
-        : `rgba(34, 197, 94, ${backgroundColor})` // Green tint
+      backgroundColor: 'transparent'
     };
   });
 
