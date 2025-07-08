@@ -126,7 +126,7 @@ export default function SwipeScreen() {
       </View>
 
       {/* Movie Cards */}
-      <View className="flex-1 items-center justify-start px-5 pt-2">
+      <View className="flex-1 items-center justify-start px-5 pt-2 pb-4">
         {currentMovie ? (
           <MovieCard
             key={currentMovie.id}
