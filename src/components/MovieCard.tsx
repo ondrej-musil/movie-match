@@ -22,7 +22,7 @@ interface MovieCardProps {
 
 const { width, height } = Dimensions.get('window');
 const CARD_WIDTH = width - 40;
-const CARD_HEIGHT = height * 0.65; // Use 65% of screen height to leave room for buttons
+const CARD_HEIGHT = height * 0.55; // Use 55% of screen height to leave more room for buttons
 
 export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps) {
   const translateX = useSharedValue(0);
@@ -156,7 +156,7 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
         <View className="relative">
           <Image
             source={{ uri: movie.poster }}
-            style={{ width: CARD_WIDTH, height: CARD_HEIGHT * 0.6 }}
+            style={{ width: CARD_WIDTH, height: CARD_HEIGHT * 0.65 }}
             contentFit="cover"
             transition={300}
           />

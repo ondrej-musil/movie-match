@@ -126,7 +126,7 @@ export default function SwipeScreen() {
       </View>
 
       {/* Movie Cards */}
-      <View className="flex-1 items-center justify-start px-5 pt-4">
+      <View className="flex-1 items-center justify-start px-5 pt-2">
         {currentMovie ? (
           <MovieCard
             key={currentMovie.id}
@@ -183,8 +183,8 @@ export default function SwipeScreen() {
 
       {/* Action Buttons and Instructions */}
       {currentMovie && (
-        <View className="px-6 pb-8">
-          <View className="flex-row justify-center space-x-8 mb-4">
+        <View className="px-6 pb-6">
+          <View className="flex-row justify-center space-x-8 mb-3">
             <Pressable
               onPress={() => handleSwipe(false)}
               className="bg-red-600 rounded-full w-16 h-16 items-center justify-center"
