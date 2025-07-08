@@ -156,7 +156,7 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
         <View className="relative">
           <Image
             source={{ uri: movie.poster }}
-            style={{ width: CARD_WIDTH, height: CARD_HEIGHT * 0.65 }}
+            style={{ width: CARD_WIDTH, height: CARD_HEIGHT * 0.55 }}
             contentFit="cover"
             transition={300}
           />
@@ -188,7 +188,7 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
         </View>
 
       {/* Movie Details */}
-      <View className="p-4 flex-1 justify-between">
+      <View className="px-6 py-4 flex-1 justify-between">
         <View>
           <Text className="text-white text-xl font-bold mb-2 numberOfLines={1}">
             {movie.title}
