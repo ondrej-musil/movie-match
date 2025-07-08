@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Pressable, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { Movie } from '../types/movie';
@@ -31,6 +31,13 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
 
   const SWIPE_THRESHOLD = width * 0.25;
 
+  // Reset card position when movie changes
+  useEffect(() => {
+    translateX.value = withSpring(0, { damping: 20, stiffness: 150 });
+    translateY.value = withSpring(0, { damping: 20, stiffness: 150 });
+    scale.value = withSpring(1, { damping: 20, stiffness: 150 });
+  }, [movie.id]);
+
   const handleSwipeComplete = (liked: boolean) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onSwipe(liked);
@@ -40,13 +47,20 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     // Animate the card off screen
     if (liked) {
-      translateX.value = withSpring(width * 1.5, { damping: 15 });
+      translateX.value = withSpring(width * 1.5, { 
+        damping: 15, 
+        stiffness: 100 
+      }, () => {
+        runOnJS(handleSwipeComplete)(true);
+      });
     } else {
-      translateX.value = withSpring(-width * 1.5, { damping: 15 });
+      translateX.value = withSpring(-width * 1.5, { 
+        damping: 15, 
+        stiffness: 100 
+      }, () => {
+        runOnJS(handleSwipeComplete)(false);
+      });
     }
-    setTimeout(() => {
-      onSwipe(liked);
-    }, 200);
   };
 
   const panGesture = Gesture.Pan()
@@ -69,12 +83,20 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
 
       if (shouldSwipeRight) {
         // Swipe right - Like
-        translateX.value = withSpring(width * 1.5, { damping: 15, stiffness: 100 });
-        runOnJS(handleSwipeComplete)(true);
+        translateX.value = withSpring(width * 1.5, { 
+          damping: 15, 
+          stiffness: 100 
+        }, () => {
+          runOnJS(handleSwipeComplete)(true);
+        });
       } else if (shouldSwipeLeft) {
         // Swipe left - Pass
-        translateX.value = withSpring(-width * 1.5, { damping: 15, stiffness: 100 });
-        runOnJS(handleSwipeComplete)(false);
+        translateX.value = withSpring(-width * 1.5, { 
+          damping: 15, 
+          stiffness: 100 
+        }, () => {
+          runOnJS(handleSwipeComplete)(false);
+        });
       } else {
         // Spring back to center
         translateX.value = withSpring(0, { damping: 20, stiffness: 150 });

@@ -49,6 +49,7 @@ export default function SwipeScreen() {
     swipeMovie(currentMovie.id, liked);
     
     if (!isLastMovie) {
+      // Add a small delay to allow animation to complete
       setTimeout(() => {
         nextMovie();
       }, 300);
@@ -126,6 +127,7 @@ export default function SwipeScreen() {
       <View className="flex-1 items-center justify-start px-5 pt-4">
         {currentMovie ? (
           <MovieCard
+            key={currentMovie.id}
             movie={currentMovie}
             onSwipe={handleSwipe}
             isVisible={true}
