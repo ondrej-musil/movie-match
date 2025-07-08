@@ -123,27 +123,30 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
     ),
   }));
 
-  const cardBackgroundStyle = useAnimatedStyle(() => {
+  const cardOverlayStyle = useAnimatedStyle(() => {
     const intensity = interpolate(
       Math.abs(translateX.value),
-      [0, SWIPE_THRESHOLD],
-      [0, 0.3], // Increase opacity for more visible color
+      [0, SWIPE_THRESHOLD * 0.3, SWIPE_THRESHOLD],
+      [0, 0.2, 0.4], // More gradual and visible color intensity
       'clamp'
     );
     
-    if (translateX.value > 10) {
-      // Swiping right - green tint
+    if (translateX.value > 20) {
+      // Swiping right - green overlay
       return {
-        backgroundColor: `rgba(34, 197, 94, ${intensity})` // Green
+        opacity: intensity,
+        backgroundColor: 'rgba(34, 197, 94, 1)' // Green
       };
-    } else if (translateX.value < -10) {
-      // Swiping left - red tint
+    } else if (translateX.value < -20) {
+      // Swiping left - red overlay  
       return {
-        backgroundColor: `rgba(239, 68, 68, ${intensity})` // Red
+        opacity: intensity,
+        backgroundColor: 'rgba(239, 68, 68, 1)' // Red
       };
     }
     
     return {
+      opacity: 0,
       backgroundColor: 'transparent'
     };
   });
@@ -157,9 +160,10 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
         )}
         style={[{ width: CARD_WIDTH, height: CARD_HEIGHT }, animatedStyle]}
       >
+        <View className="absolute inset-0 bg-gray-800 rounded-2xl" />
         <Animated.View 
-          className="absolute inset-0 bg-gray-800 rounded-2xl"
-          style={cardBackgroundStyle} 
+          className="absolute inset-0 rounded-2xl"
+          style={cardOverlayStyle} 
         />
         <View className="flex-1 bg-gray-800 rounded-2xl">
         {/* Movie Poster */}
