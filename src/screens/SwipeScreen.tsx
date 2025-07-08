@@ -192,9 +192,7 @@ export default function SwipeScreen() {
               <Text className="text-green-400 text-lg ml-2">→</Text>
             </View>
           </View>
-          <Text className="text-gray-500 text-center text-xs">
-            Or use the buttons below
-          </Text>
+
         </View>
       )}
     </SafeAreaView>
