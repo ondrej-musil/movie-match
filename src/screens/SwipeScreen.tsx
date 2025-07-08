@@ -181,21 +181,10 @@ export default function SwipeScreen() {
         </View>
       )}
 
-      {/* Instructions and Action Buttons */}
+      {/* Action Buttons and Instructions */}
       {currentMovie && (
         <View className="px-6 pb-8">
-          <View className="flex-row items-center justify-center space-x-6 mb-4">
-            <View className="flex-row items-center">
-              <Text className="text-red-400 text-lg mr-2">←</Text>
-              <Text className="text-gray-400 text-sm">Swipe left to pass</Text>
-            </View>
-            <View className="flex-row items-center">
-              <Text className="text-gray-400 text-sm">Swipe right to like</Text>
-              <Text className="text-green-400 text-lg ml-2">→</Text>
-            </View>
-          </View>
-          
-          <View className="flex-row justify-center space-x-8">
+          <View className="flex-row justify-center space-x-8 mb-4">
             <Pressable
               onPress={() => handleSwipe(false)}
               className="bg-red-600 rounded-full w-16 h-16 items-center justify-center"
@@ -209,6 +198,17 @@ export default function SwipeScreen() {
             >
               <Ionicons name="heart" size={32} color="white" />
             </Pressable>
+          </View>
+          
+          <View className="flex-row items-center justify-center space-x-6">
+            <View className="flex-row items-center">
+              <Text className="text-red-400 text-lg mr-2">←</Text>
+              <Text className="text-gray-400 text-sm">Swipe left to pass</Text>
+            </View>
+            <View className="flex-row items-center">
+              <Text className="text-gray-400 text-sm">Swipe right to like</Text>
+              <Text className="text-green-400 text-lg ml-2">→</Text>
+            </View>
           </View>
         </View>
       )}
