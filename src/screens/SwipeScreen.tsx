@@ -202,9 +202,9 @@ export default function SwipeScreen() {
             
             <Pressable
               onPress={handleMovieDetail}
-              className="bg-blue-600 rounded-full w-14 h-14 items-center justify-center"
+              className="border-2 border-gray-400 rounded-full w-14 h-14 items-center justify-center"
             >
-              <Ionicons name="information" size={24} color="white" />
+              <Ionicons name="information" size={24} color="#9ca3af" />
             </Pressable>
             
             <Pressable
