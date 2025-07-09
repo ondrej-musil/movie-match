@@ -53,11 +53,6 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
     }
   };
 
-  const tapGesture = Gesture.Tap()
-    .onEnd(() => {
-      runOnJS(handleTap)();
-    });
-
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
       translateX.value = event.translationX;
@@ -75,6 +70,10 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
     .onEnd((event) => {
       const shouldSwipeRight = event.translationX > SWIPE_THRESHOLD;
       const shouldSwipeLeft = event.translationX < -SWIPE_THRESHOLD;
+      
+      // Check if this was a tap (minimal movement)
+      const totalMovement = Math.abs(event.translationX) + Math.abs(event.translationY);
+      const isTap = totalMovement < 10; // Less than 10px movement = tap
 
       if (shouldSwipeRight) {
         // Swipe right - Like
@@ -92,15 +91,16 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
         }, () => {
           runOnJS(handleSwipeComplete)(false);
         });
+      } else if (isTap) {
+        // This was a tap, not a swipe
+        runOnJS(handleTap)();
       } else {
-        // Spring back to center
+        // Spring back to center (partial swipe)
         translateX.value = withSpring(0, { damping: 20, stiffness: 150 });
         translateY.value = withSpring(0, { damping: 20, stiffness: 150 });
         scale.value = withSpring(1, { damping: 20, stiffness: 150 });
       }
     });
-
-  const composedGesture = Gesture.Simultaneous(tapGesture, panGesture);
 
   const animatedStyle = useAnimatedStyle(() => {
     const rotate = interpolate(
@@ -167,7 +167,7 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
   });
 
   return (
-    <GestureDetector gesture={composedGesture}>
+    <GestureDetector gesture={panGesture}>
       <Animated.View 
         className={cn(
           "absolute rounded-2xl overflow-hidden shadow-2xl",
