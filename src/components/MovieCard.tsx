@@ -17,6 +17,7 @@ import * as Haptics from 'expo-haptics';
 interface MovieCardProps {
   movie: Movie;
   onSwipe: (liked: boolean) => void;
+  onTap?: () => void;
   isVisible: boolean;
 }
 
@@ -24,7 +25,7 @@ const { width, height } = Dimensions.get('window');
 const CARD_WIDTH = width - 40;
 const CARD_HEIGHT = height * 0.52; // Use 52% of screen height to leave more room for buttons
 
-export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps) {
+export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCardProps) {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const scale = useSharedValue(1);
@@ -44,6 +45,18 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
   };
 
 
+
+  const handleTap = () => {
+    if (onTap) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onTap();
+    }
+  };
+
+  const tapGesture = Gesture.Tap()
+    .onEnd(() => {
+      runOnJS(handleTap)();
+    });
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
@@ -86,6 +99,8 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
         scale.value = withSpring(1, { damping: 20, stiffness: 150 });
       }
     });
+
+  const composedGesture = Gesture.Simultaneous(tapGesture, panGesture);
 
   const animatedStyle = useAnimatedStyle(() => {
     const rotate = interpolate(
@@ -152,7 +167,7 @@ export default function MovieCard({ movie, onSwipe, isVisible }: MovieCardProps)
   });
 
   return (
-    <GestureDetector gesture={panGesture}>
+    <GestureDetector gesture={composedGesture}>
       <Animated.View 
         className={cn(
           "absolute rounded-2xl overflow-hidden shadow-2xl",

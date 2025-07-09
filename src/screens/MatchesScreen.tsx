@@ -22,8 +22,15 @@ export default function MatchesScreen() {
 
   const matchedMovies = getMatchedMovies();
 
+  const handleMovieDetail = (movie: Movie) => {
+    navigation.navigate('MovieDetail', { movie });
+  };
+
   const renderMatchItem = ({ item }: { item: typeof matchedMovies[0] }) => (
-    <View className="bg-gray-800 rounded-xl p-4 mb-4 flex-row">
+    <Pressable 
+      onPress={() => handleMovieDetail(item.movie)}
+      className="bg-gray-800 rounded-xl p-4 mb-4 flex-row"
+    >
       <Image
         source={{ uri: item.movie.poster }}
         style={{ width: 80, height: 120 }}
@@ -57,7 +64,7 @@ export default function MatchesScreen() {
           </Text>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 
   return (

@@ -73,6 +73,12 @@ export default function SwipeScreen() {
     navigation.navigate('Matches');
   };
 
+  const handleMovieDetail = () => {
+    if (currentMovie) {
+      navigation.navigate('MovieDetail', { movie: currentMovie });
+    }
+  };
+
   if (!currentRoom) {
     return (
       <SafeAreaView className="flex-1 bg-gray-900 justify-center items-center">
@@ -132,6 +138,7 @@ export default function SwipeScreen() {
             key={currentMovie.id}
             movie={currentMovie}
             onSwipe={handleSwipe}
+            onTap={handleMovieDetail}
             isVisible={true}
           />
         ) : (

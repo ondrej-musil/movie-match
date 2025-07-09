@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useMovieMatchStore } from '../state/movieMatchStore';
+import { Movie } from '../types/movie';
 
 // Import screens
 import HomeScreen from '../screens/HomeScreen';
@@ -8,6 +9,7 @@ import CreateRoomScreen from '../screens/CreateRoomScreen';
 import JoinRoomScreen from '../screens/JoinRoomScreen';
 import SwipeScreen from '../screens/SwipeScreen';
 import MatchesScreen from '../screens/MatchesScreen';
+import MovieDetailScreen from '../screens/MovieDetailScreen';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -15,6 +17,7 @@ export type RootStackParamList = {
   JoinRoom: undefined;
   Swipe: undefined;
   Matches: undefined;
+  MovieDetail: { movie: Movie };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -67,6 +70,15 @@ export default function AppNavigator() {
             name="Matches" 
             component={MatchesScreen} 
             options={{ title: 'Matches' }}
+          />
+          <Stack.Screen 
+            name="MovieDetail" 
+            component={MovieDetailScreen} 
+            options={{ 
+              title: 'Movie Details',
+              presentation: 'modal',
+              headerShown: false,
+            }}
           />
         </>
       )}
