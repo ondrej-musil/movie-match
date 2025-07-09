@@ -187,7 +187,7 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
             source={{ uri: movie.poster }}
             style={{ width: CARD_WIDTH, height: CARD_HEIGHT * 0.5 }}
             contentFit="cover"
-            contentPosition="top"
+            contentPosition="center"
             transition={300}
           />
           

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Movie, Room, Match, UserSwipe } from '../types/movie';
-import { mockMovies } from '../data/mockMovies';
+import { fetchTMDBMovies } from '../api/tmdb';
 
 interface MovieMatchState {
   // Current user
@@ -56,19 +56,26 @@ export const useMovieMatchStore = create<MovieMatchState>()(
 
       setUserId: (id: string) => set({ userId: id }),
 
-      createRoom: () => {
+      createRoom: async () => {
         const pin = generatePin();
         const { userId } = get();
+        let movies = [];
+        try {
+          movies = await fetchTMDBMovies();
+        } catch (e) {
+          // fallback to mockMovies if TMDB fetch fails
+          const { mockMovies } = await import('../data/mockMovies');
+          movies = mockMovies;
+        }
         const newRoom: Room = {
           id: 'room_' + Date.now(),
           pin,
           users: [userId],
-          movies: [...mockMovies],
+          movies,
           matches: [],
           isActive: true,
           createdAt: new Date(),
         };
-        
         set({ 
           currentRoom: newRoom, 
           currentMovieIndex: 0,
