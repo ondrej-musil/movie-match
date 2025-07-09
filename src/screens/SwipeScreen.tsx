@@ -75,6 +75,7 @@ export default function SwipeScreen() {
 
   const handleMovieDetail = () => {
     if (currentMovie) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       navigation.navigate('MovieDetail', { movie: currentMovie });
     }
   };
@@ -191,12 +192,19 @@ export default function SwipeScreen() {
       {/* Action Buttons and Instructions */}
       {currentMovie && (
         <View className="px-6 pb-6">
-          <View className="flex-row justify-center space-x-8 mb-3">
+          <View className="flex-row justify-center items-center space-x-6 mb-3">
             <Pressable
               onPress={() => handleSwipe(false)}
               className="bg-red-600 rounded-full w-16 h-16 items-center justify-center"
             >
               <Ionicons name="close" size={32} color="white" />
+            </Pressable>
+            
+            <Pressable
+              onPress={handleMovieDetail}
+              className="bg-blue-600 rounded-full w-14 h-14 items-center justify-center"
+            >
+              <Ionicons name="information" size={24} color="white" />
             </Pressable>
             
             <Pressable
