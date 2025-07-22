@@ -93,19 +93,12 @@ export default function SwipeScreen() {
       {/* Header */}
       <View className="flex-row items-center justify-between px-6 py-4">
         <View className="flex-row items-center space-x-4">
-          <Pressable
-            onPress={handleLeaveRoom}
-            className="bg-gray-700 rounded-full p-2 flex-row items-center space-x-2"
-          >
-            <Ionicons name="arrow-back" size={20} color="white" />
-          </Pressable>
-          
+          {/* Player indicator moved to the leftmost position */}
           <View className="flex-row items-center">
             <Ionicons name="people-outline" size={24} color="#9ca3af" />
             <Text className="text-gray-400 ml-2">{currentRoom.users.length} players</Text>
           </View>
         </View>
-        
         <View className="flex-row items-center space-x-4">
           <Pressable
             onPress={handleViewMatches}
@@ -116,7 +109,6 @@ export default function SwipeScreen() {
           </Pressable>
         </View>
       </View>
-
       {/* Progress Bar */}
       <View className="px-6 mb-4">
         <View className="bg-gray-700 rounded-full h-2">

@@ -238,7 +238,7 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
               </Text>
               <View className="flex-row items-center mb-2">
                 <Text className="text-gray-400 text-sm">
-                  {movie.year} • {movie.duration}min
+                  {movie.year} • {movie.duration === 0 ? 'I couldn’t find how long the movie is.' : `${movie.duration}min`}
                 </Text>
               </View>
               <View className="flex-row flex-wrap mb-2">
@@ -249,7 +249,7 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
                 ))}
               </View>
               {/* Watch Providers for Card */}
-              <View className="mt-2 mb-2">
+              <View className="mb-2">
                 {loadingProviders ? (
                   <Text className="text-gray-400 text-xs">Loading providers...</Text>
                 ) : providers ? (
@@ -260,7 +260,7 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
                         {providers.flatrate.slice(0, 3).map((prov: any) => (
                           <View
                             key={prov.provider_id}
-                            className="bg-blue-700 rounded-full px-3 py-1 mr-2 mb-2"
+                            className="bg-blue-700 rounded-full px-3 py-1 mr-2 mb-1"
                             style={{ minHeight: 24, justifyContent: 'center' }}
                           >
                             <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
@@ -277,7 +277,7 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
                             {providers.rent.slice(0, 3).map((prov: any) => (
                               <View
                                 key={prov.provider_id}
-                                className="bg-yellow-700 rounded-full px-3 py-1 mr-2 mb-2"
+                                className="bg-yellow-700 rounded-full px-3 py-1 mr-2 mb-1"
                                 style={{ minHeight: 24, justifyContent: 'center' }}
                               >
                                 <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
@@ -293,7 +293,7 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
                             {providers.buy.slice(0, 3).map((prov: any) => (
                               <View
                                 key={prov.provider_id}
-                                className="bg-green-700 rounded-full px-3 py-1 mr-2 mb-2"
+                                className="bg-green-700 rounded-full px-3 py-1 mr-2 mb-1"
                                 style={{ minHeight: 24, justifyContent: 'center' }}
                               >
                                 <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
