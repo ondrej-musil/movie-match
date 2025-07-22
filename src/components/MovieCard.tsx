@@ -254,37 +254,54 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
                   <Text className="text-gray-400 text-xs">Loading providers...</Text>
                 ) : providers ? (
                   providers.flatrate && providers.flatrate.length > 0 ? (
-                    <View className="flex-row flex-wrap items-center">
-                      {providers.flatrate.slice(0, 3).map((prov: any) => (
-                        <View
-                          key={prov.provider_id}
-                          className="bg-blue-700 rounded-full px-3 py-1 mr-2 mb-2"
-                          style={{ minHeight: 24, justifyContent: 'center' }}
-                        >
-                          <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
-                        </View>
-                      ))}
+                    <View>
+                      <Text className="text-gray-300 font-semibold mb-1 text-xs">Streaming</Text>
+                      <View className="flex-row flex-wrap items-center">
+                        {providers.flatrate.slice(0, 3).map((prov: any) => (
+                          <View
+                            key={prov.provider_id}
+                            className="bg-blue-700 rounded-full px-3 py-1 mr-2 mb-2"
+                            style={{ minHeight: 24, justifyContent: 'center' }}
+                          >
+                            <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
+                          </View>
+                        ))}
+                      </View>
                     </View>
                   ) : (providers.rent && providers.rent.length > 0 || providers.buy && providers.buy.length > 0) ? (
-                    <View className="flex-row flex-wrap items-center">
-                      {providers.rent && providers.rent.slice(0, 3).map((prov: any) => (
-                        <View
-                          key={prov.provider_id}
-                          className="bg-yellow-700 rounded-full px-3 py-1 mr-2 mb-2"
-                          style={{ minHeight: 24, justifyContent: 'center' }}
-                        >
-                          <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
-                        </View>
-                      ))}
-                      {providers.buy && providers.buy.slice(0, 3).map((prov: any) => (
-                        <View
-                          key={prov.provider_id}
-                          className="bg-green-700 rounded-full px-3 py-1 mr-2 mb-2"
-                          style={{ minHeight: 24, justifyContent: 'center' }}
-                        >
-                          <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
-                        </View>
-                      ))}
+                    <View>
+                      {providers.rent && providers.rent.length > 0 && (
+                        <>
+                          <Text className="text-gray-300 font-semibold mb-1 text-xs">Rent</Text>
+                          <View className="flex-row flex-wrap items-center">
+                            {providers.rent.slice(0, 3).map((prov: any) => (
+                              <View
+                                key={prov.provider_id}
+                                className="bg-yellow-700 rounded-full px-3 py-1 mr-2 mb-2"
+                                style={{ minHeight: 24, justifyContent: 'center' }}
+                              >
+                                <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        </>
+                      )}
+                      {providers.buy && providers.buy.length > 0 && (
+                        <>
+                          <Text className="text-gray-300 font-semibold mb-1 text-xs">Buy</Text>
+                          <View className="flex-row flex-wrap items-center">
+                            {providers.buy.slice(0, 3).map((prov: any) => (
+                              <View
+                                key={prov.provider_id}
+                                className="bg-green-700 rounded-full px-3 py-1 mr-2 mb-2"
+                                style={{ minHeight: 24, justifyContent: 'center' }}
+                              >
+                                <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        </>
+                      )}
                     </View>
                   ) : (
                     <Text className="text-gray-400 text-xs">I couldn’t find where to watch this movie.</Text>
