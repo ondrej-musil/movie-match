@@ -18,8 +18,8 @@ export default function CreateRoomScreen() {
   const handleCreateRoom = async () => {
     setIsLoading(true);
     try {
-      const pin = createRoom();
-      setRoomPin(pin);
+      const pin = await createRoom();
+      navigation.navigate('WaitingRoom', { pin });
     } catch (error) {
       Alert.alert('Error', 'Failed to create room. Please try again.');
     } finally {
