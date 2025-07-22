@@ -76,15 +76,19 @@ export const useMovieMatchStore = create<MovieMatchState>()(
           id: 'room_' + Date.now(),
           pin,
           users: [userId],
+          hostId: userId,
           movies,
           matches: [],
           isActive: true,
           createdAt: new Date(),
-        };
+          started: false,
+        } as any;
         // Store in Firestore
         await setDoc(doc(db, 'rooms', pin), {
           ...newRoom,
           createdAt: serverTimestamp(),
+          started: false,
+          hostId: userId,
         });
         set({ 
           currentRoom: newRoom, 

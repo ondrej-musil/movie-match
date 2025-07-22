@@ -25,9 +25,9 @@ export default function JoinRoomScreen() {
     setError(null);
 
     try {
-      const success = joinRoom(pin);
+      const success = await joinRoom(pin);
       if (success) {
-        navigation.navigate('Swipe');
+        navigation.navigate('WaitingRoom', { pin });
       }
     } catch (error) {
       setError('Failed to join room. Please try again.');
