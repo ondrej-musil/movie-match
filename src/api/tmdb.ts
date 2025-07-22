@@ -48,4 +48,20 @@ export async function fetchTMDBMovies(): Promise<Movie[]> {
     cast: [],     // Not available in discover endpoint
     duration: 0,  // Not available in discover endpoint
   }));
+}
+
+export async function fetchWatchProviders(movieId: number | string) {
+  const res = await fetch(
+    `https://api.themoviedb.org/3/movie/${movieId}/watch/providers`,
+    {
+      headers: {
+        Authorization: TMDB_AUTH_HEADER,
+        accept: 'application/json',
+      },
+    }
+  );
+  if (!res.ok) throw new Error('Failed to fetch watch providers');
+  const data = await res.json();
+  // Prioritize US providers
+  return data.results?.US || null;
 } 

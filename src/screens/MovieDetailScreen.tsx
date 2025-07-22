@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, ScrollView, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -6,6 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Movie } from '../types/movie';
 import * as Haptics from 'expo-haptics';
+import { fetchWatchProviders } from '../api/tmdb';
 
 const { width } = Dimensions.get('window');
 
@@ -13,6 +14,23 @@ export default function MovieDetailScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { movie } = route.params as { movie: Movie };
+
+  const [providers, setProviders] = useState<any>(null);
+  const [loadingProviders, setLoadingProviders] = useState(true);
+  const [errorProviders, setErrorProviders] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoadingProviders(true);
+    fetchWatchProviders(movie.id)
+      .then((data) => {
+        setProviders(data);
+        setLoadingProviders(false);
+      })
+      .catch((err) => {
+        setErrorProviders('Could not load watch providers');
+        setLoadingProviders(false);
+      });
+  }, [movie.id]);
 
   const handleClose = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -102,6 +120,77 @@ export default function MovieDetailScreen() {
             <Text className="text-gray-300 text-base leading-6">
               {movie.description}
             </Text>
+          </View>
+
+          {/* Watch Providers */}
+          <View className="mb-8">
+            <Text className="text-white text-lg font-semibold mb-2">Where to Watch <Text className="text-xs text-gray-400">(Powered by JustWatch)</Text></Text>
+            {loadingProviders && (
+              <Text className="text-gray-400">Loading providers...</Text>
+            )}
+            {errorProviders && (
+              <Text className="text-red-400">{errorProviders}</Text>
+            )}
+            {providers && (
+              <>
+                {providers.flatrate && providers.flatrate.length > 0 && (
+                  <View className="mb-2">
+                    <Text className="text-gray-300 font-semibold mb-1">Streaming</Text>
+                    <View className="flex-row flex-wrap items-center">
+                      {providers.flatrate.map((prov: any) => (
+                        <View key={prov.provider_id} className="items-center mr-4 mb-2">
+                          <Image
+                            source={{ uri: `https://image.tmdb.org/t/p/original${prov.logo_path}` }}
+                            style={{ width: 32, height: 32, borderRadius: 8 }}
+                          />
+                          <Text className="text-xs text-gray-300 mt-1 text-center" style={{ maxWidth: 60 }}>{prov.provider_name}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
+                {providers.rent && providers.rent.length > 0 && (
+                  <View className="mb-2">
+                    <Text className="text-gray-300 font-semibold mb-1">Rent</Text>
+                    <View className="flex-row flex-wrap items-center">
+                      {providers.rent.map((prov: any) => (
+                        <View key={prov.provider_id} className="items-center mr-4 mb-2">
+                          <Image
+                            source={{ uri: `https://image.tmdb.org/t/p/original${prov.logo_path}` }}
+                            style={{ width: 32, height: 32, borderRadius: 8 }}
+                          />
+                          <Text className="text-xs text-gray-300 mt-1 text-center" style={{ maxWidth: 60 }}>{prov.provider_name}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
+                {providers.buy && providers.buy.length > 0 && (
+                  <View className="mb-2">
+                    <Text className="text-gray-300 font-semibold mb-1">Buy</Text>
+                    <View className="flex-row flex-wrap items-center">
+                      {providers.buy.map((prov: any) => (
+                        <View key={prov.provider_id} className="items-center mr-4 mb-2">
+                          <Image
+                            source={{ uri: `https://image.tmdb.org/t/p/original${prov.logo_path}` }}
+                            style={{ width: 32, height: 32, borderRadius: 8 }}
+                          />
+                          <Text className="text-xs text-gray-300 mt-1 text-center" style={{ maxWidth: 60 }}>{prov.provider_name}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
+                {!providers.flatrate && !providers.rent && !providers.buy && (
+                  <Text className="text-gray-400">No providers found for this movie in the US.</Text>
+                )}
+                {providers.link && (
+                  <Text className="text-xs text-blue-400 mt-2" selectable>
+                    More info: {providers.link}
+                  </Text>
+                )}
+              </>
+            )}
           </View>
         </View>
       </ScrollView>
