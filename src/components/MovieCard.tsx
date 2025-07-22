@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { Movie } from '../types/movie';
@@ -13,6 +13,7 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { fetchWatchProviders } from '../api/tmdb';
 
 interface MovieCardProps {
   movie: Movie;
@@ -166,6 +167,22 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
     };
   });
 
+  const [providers, setProviders] = useState<any>(null);
+  const [loadingProviders, setLoadingProviders] = useState(true);
+
+  useEffect(() => {
+    setLoadingProviders(true);
+    fetchWatchProviders(movie.id)
+      .then((data) => {
+        setProviders(data);
+        setLoadingProviders(false);
+      })
+      .catch(() => {
+        setProviders(null);
+        setLoadingProviders(false);
+      });
+  }, [movie.id]);
+
   return (
     <GestureDetector gesture={panGesture}>
       <Animated.View 
@@ -181,70 +198,106 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
           style={cardOverlayStyle} 
         />
         <View className="flex-1 bg-gray-800 rounded-2xl">
-        {/* Movie Poster */}
-        <View className="relative">
-          <Image
-            source={{ uri: movie.poster }}
-            style={{ width: CARD_WIDTH, height: CARD_HEIGHT * 0.5 }}
-            contentFit="cover"
-            contentPosition="center"
-            transition={300}
-          />
-          
-          {/* Rating Badge */}
-          <View className="absolute top-4 right-4 bg-yellow-500 rounded-full px-3 py-1 flex-row items-center">
-            <Ionicons name="star" size={16} color="white" />
-            <Text className="text-white font-bold ml-1">{movie.rating}</Text>
-          </View>
-
-          {/* Swipe Indicators */}
-          <Animated.View 
-            className="absolute inset-0 items-center justify-center"
-            style={likeOpacityStyle}
-          >
-            <View className="bg-green-500 rounded-full p-4 rotate-12">
-              <Ionicons name="heart" size={48} color="white" />
+          {/* Movie Poster */}
+          <View className="relative">
+            <Image
+              source={{ uri: movie.poster }}
+              style={{ width: CARD_WIDTH, height: CARD_HEIGHT * 0.5 }}
+              contentFit="cover"
+              contentPosition="center"
+              transition={300}
+            />
+            {/* Rating Badge */}
+            <View className="absolute top-4 right-4 bg-yellow-500 rounded-full px-3 py-1 flex-row items-center">
+              <Ionicons name="star" size={16} color="white" />
+              <Text className="text-white font-bold ml-1">{movie.rating}</Text>
             </View>
-          </Animated.View>
-
-          <Animated.View 
-            className="absolute inset-0 items-center justify-center"
-            style={passOpacityStyle}
-          >
-            <View className="bg-red-500 rounded-full p-4 -rotate-12">
-              <Ionicons name="close" size={48} color="white" />
-            </View>
-          </Animated.View>
-        </View>
-
-      {/* Movie Details */}
-      <View className="p-4 flex-1 justify-between">
-        <View>
-          <Text className="text-white text-xl font-bold mb-2 numberOfLines={1}">
-            {movie.title}
-          </Text>
-          
-          <View className="flex-row items-center mb-2">
-            <Text className="text-gray-400 text-sm">
-              {movie.year} • {movie.duration}min
-            </Text>
-          </View>
-
-          <View className="flex-row flex-wrap mb-2">
-            {movie.genre.slice(0, 3).map((genre, index) => (
-              <View key={index} className="bg-gray-700 rounded-full px-2 py-1 mr-2 mb-1">
-                <Text className="text-gray-300 text-xs">{genre}</Text>
+            {/* Swipe Indicators */}
+            <Animated.View 
+              className="absolute inset-0 items-center justify-center"
+              style={likeOpacityStyle}
+            >
+              <View className="bg-green-500 rounded-full p-4 rotate-12">
+                <Ionicons name="heart" size={48} color="white" />
               </View>
-            ))}
+            </Animated.View>
+            <Animated.View 
+              className="absolute inset-0 items-center justify-center"
+              style={passOpacityStyle}
+            >
+              <View className="bg-red-500 rounded-full p-4 -rotate-12">
+                <Ionicons name="close" size={48} color="white" />
+              </View>
+            </Animated.View>
           </View>
-
-          <Text className="text-gray-300 text-xs numberOfLines={2}">
-            {movie.description}
-          </Text>
-        </View>
-
-
-        </View>
+          {/* Movie Details */}
+          <View className="p-4 flex-1 justify-between">
+            <View>
+              <Text className="text-white text-xl font-bold mb-2 numberOfLines={1}">
+                {movie.title}
+              </Text>
+              <View className="flex-row items-center mb-2">
+                <Text className="text-gray-400 text-sm">
+                  {movie.year} • {movie.duration}min
+                </Text>
+              </View>
+              <View className="flex-row flex-wrap mb-2">
+                {movie.genre.slice(0, 3).map((genre, index) => (
+                  <View key={index} className="bg-gray-700 rounded-full px-2 py-1 mr-2 mb-1">
+                    <Text className="text-gray-300 text-xs">{genre}</Text>
+                  </View>
+                ))}
+              </View>
+              {/* Watch Providers for Card */}
+              <View className="mt-2 mb-2">
+                {loadingProviders ? (
+                  <Text className="text-gray-400 text-xs">Loading providers...</Text>
+                ) : providers ? (
+                  providers.flatrate && providers.flatrate.length > 0 ? (
+                    <View className="flex-row flex-wrap items-center">
+                      {providers.flatrate.slice(0, 3).map((prov: any) => (
+                        <View
+                          key={prov.provider_id}
+                          className="bg-blue-700 rounded-full px-3 py-1 mr-2 mb-2"
+                          style={{ minHeight: 24, justifyContent: 'center' }}
+                        >
+                          <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  ) : (providers.rent && providers.rent.length > 0 || providers.buy && providers.buy.length > 0) ? (
+                    <View className="flex-row flex-wrap items-center">
+                      {providers.rent && providers.rent.slice(0, 3).map((prov: any) => (
+                        <View
+                          key={prov.provider_id}
+                          className="bg-yellow-700 rounded-full px-3 py-1 mr-2 mb-2"
+                          style={{ minHeight: 24, justifyContent: 'center' }}
+                        >
+                          <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
+                        </View>
+                      ))}
+                      {providers.buy && providers.buy.slice(0, 3).map((prov: any) => (
+                        <View
+                          key={prov.provider_id}
+                          className="bg-green-700 rounded-full px-3 py-1 mr-2 mb-2"
+                          style={{ minHeight: 24, justifyContent: 'center' }}
+                        >
+                          <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  ) : (
+                    <Text className="text-gray-400 text-xs">I couldn’t find where to watch this movie.</Text>
+                  )
+                ) : (
+                  <Text className="text-gray-400 text-xs">I couldn’t find where to watch this movie.</Text>
+                )}
+              </View>
+              <Text className="text-gray-300 text-xs numberOfLines={2}">
+                {movie.description}
+              </Text>
+            </View>
+          </View>
         </View>
       </Animated.View>
     </GestureDetector>

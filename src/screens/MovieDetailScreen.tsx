@@ -114,14 +114,6 @@ export default function MovieDetailScreen() {
             </View>
           </View>
 
-          {/* Description */}
-          <View className="mb-8">
-            <Text className="text-white text-lg font-semibold mb-3">Plot</Text>
-            <Text className="text-gray-300 text-base leading-6">
-              {movie.description}
-            </Text>
-          </View>
-
           {/* Watch Providers */}
           <View className="mb-8">
             <Text className="text-white text-lg font-semibold mb-2">Where to Watch <Text className="text-xs text-gray-400">(Powered by JustWatch)</Text></Text>
@@ -138,12 +130,12 @@ export default function MovieDetailScreen() {
                     <Text className="text-gray-300 font-semibold mb-1">Streaming</Text>
                     <View className="flex-row flex-wrap items-center">
                       {providers.flatrate.map((prov: any) => (
-                        <View key={prov.provider_id} className="items-center mr-4 mb-2">
-                          <Image
-                            source={{ uri: `https://image.tmdb.org/t/p/original${prov.logo_path}` }}
-                            style={{ width: 32, height: 32, borderRadius: 8 }}
-                          />
-                          <Text className="text-xs text-gray-300 mt-1 text-center" style={{ maxWidth: 60 }}>{prov.provider_name}</Text>
+                        <View
+                          key={prov.provider_id}
+                          className="bg-blue-700 rounded-full px-3 py-1 mr-2 mb-2"
+                          style={{ minHeight: 28, justifyContent: 'center' }}
+                        >
+                          <Text className="text-xs text-white" style={{ lineHeight: 18 }}>{prov.provider_name}</Text>
                         </View>
                       ))}
                     </View>
@@ -154,12 +146,12 @@ export default function MovieDetailScreen() {
                     <Text className="text-gray-300 font-semibold mb-1">Rent</Text>
                     <View className="flex-row flex-wrap items-center">
                       {providers.rent.map((prov: any) => (
-                        <View key={prov.provider_id} className="items-center mr-4 mb-2">
-                          <Image
-                            source={{ uri: `https://image.tmdb.org/t/p/original${prov.logo_path}` }}
-                            style={{ width: 32, height: 32, borderRadius: 8 }}
-                          />
-                          <Text className="text-xs text-gray-300 mt-1 text-center" style={{ maxWidth: 60 }}>{prov.provider_name}</Text>
+                        <View
+                          key={prov.provider_id}
+                          className="bg-yellow-700 rounded-full px-3 py-1 mr-2 mb-2"
+                          style={{ minHeight: 28, justifyContent: 'center' }}
+                        >
+                          <Text className="text-xs text-white" style={{ lineHeight: 18 }}>{prov.provider_name}</Text>
                         </View>
                       ))}
                     </View>
@@ -170,12 +162,12 @@ export default function MovieDetailScreen() {
                     <Text className="text-gray-300 font-semibold mb-1">Buy</Text>
                     <View className="flex-row flex-wrap items-center">
                       {providers.buy.map((prov: any) => (
-                        <View key={prov.provider_id} className="items-center mr-4 mb-2">
-                          <Image
-                            source={{ uri: `https://image.tmdb.org/t/p/original${prov.logo_path}` }}
-                            style={{ width: 32, height: 32, borderRadius: 8 }}
-                          />
-                          <Text className="text-xs text-gray-300 mt-1 text-center" style={{ maxWidth: 60 }}>{prov.provider_name}</Text>
+                        <View
+                          key={prov.provider_id}
+                          className="bg-green-700 rounded-full px-3 py-1 mr-2 mb-2"
+                          style={{ minHeight: 28, justifyContent: 'center' }}
+                        >
+                          <Text className="text-xs text-white" style={{ lineHeight: 18 }}>{prov.provider_name}</Text>
                         </View>
                       ))}
                     </View>
@@ -191,6 +183,12 @@ export default function MovieDetailScreen() {
                 )}
               </>
             )}
+          </View>
+
+          {/* Description */}
+          <View className="mb-8">
+            <Text className="text-white text-lg font-semibold mb-2">Description</Text>
+            <Text className="text-gray-300 text-base">{movie.description}</Text>
           </View>
         </View>
       </ScrollView>
