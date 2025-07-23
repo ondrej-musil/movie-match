@@ -8,6 +8,7 @@ import { db } from '../api/firebase';
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { useMovieMatchStore } from '../state/movieMatchStore';
 import { Ionicons } from '@expo/vector-icons';
+import { Share } from 'react-native';
 
 // Define the route prop type for this screen
  type WaitingRoomScreenRouteProp = RouteProp<RootStackParamList, 'WaitingRoom'>;
@@ -58,6 +59,17 @@ export default function WaitingRoomScreen() {
       <View className="bg-gray-800 rounded-2xl p-8 mb-8 items-center">
         <Text className="text-gray-400 text-sm mb-2">ROOM PIN</Text>
         <Text className="text-6xl font-bold text-white tracking-widest">{pin}</Text>
+        <Pressable
+          onPress={async () => {
+            await Share.share({
+              message: `Join my Movie Matcher room! Use PIN: ${pin}`,
+            });
+          }}
+          className="bg-blue-600 rounded-lg py-2 px-4 flex-row items-center justify-center mt-6"
+        >
+          <Ionicons name="share-outline" size={20} color="white" style={{ marginRight: 6 }} />
+          <Text className="text-white font-semibold text-base">Share</Text>
+        </Pressable>
       </View>
       <View className="flex-row items-center mb-2">
         <Ionicons name="person" size={22} color="#9CA3AF" style={{ marginRight: 6 }} />
