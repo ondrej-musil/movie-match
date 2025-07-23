@@ -7,6 +7,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { db } from '../api/firebase';
 import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { useMovieMatchStore } from '../state/movieMatchStore';
+import { Ionicons } from '@expo/vector-icons';
 
 // Define the route prop type for this screen
  type WaitingRoomScreenRouteProp = RouteProp<RootStackParamList, 'WaitingRoom'>;
@@ -58,7 +59,12 @@ export default function WaitingRoomScreen() {
         <Text className="text-gray-400 text-sm mb-2">ROOM PIN</Text>
         <Text className="text-6xl font-bold text-white tracking-widest">{pin}</Text>
       </View>
-      <Text className="text-gray-400 text-lg mb-2">{users.length} player{users.length === 1 ? '' : 's'} waiting...</Text>
+      <View className="flex-row items-center mb-2">
+        <Ionicons name="person" size={22} color="#9CA3AF" style={{ marginRight: 6 }} />
+        <Text className="text-gray-400 text-lg">
+          {users.length} player{users.length === 1 ? '' : 's'}
+        </Text>
+      </View>
       {!started ? (
         <>
           <Text className="text-gray-400 text-lg mb-8">Waiting for host to start the game...</Text>
