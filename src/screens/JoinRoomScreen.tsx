@@ -69,6 +69,8 @@ export default function JoinRoomScreen() {
             keyboardType="numeric"
             maxLength={4}
             autoFocus
+            returnKeyType="done"
+            onSubmitEditing={handleJoinRoom}
           />
           {error && (
             <View className="flex-row items-center mt-2">
