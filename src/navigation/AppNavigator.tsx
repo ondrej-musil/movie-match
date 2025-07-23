@@ -11,6 +11,7 @@ import WaitingRoomScreen from '../screens/WaitingRoomScreen';
 import SwipeScreen from '../screens/SwipeScreen';
 import MatchesScreen from '../screens/MatchesScreen';
 import MovieDetailScreen from '../screens/MovieDetailScreen';
+import ResultsScreen from '../screens/ResultsScreen';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -19,6 +20,7 @@ export type RootStackParamList = {
   WaitingRoom: { pin: string };
   Swipe: undefined;
   Matches: undefined;
+  Results: undefined;
   MovieDetail: { movie: Movie };
 };
 
@@ -72,6 +74,11 @@ export default function AppNavigator() {
             name="Matches" 
             component={MatchesScreen} 
             options={{ title: 'Matches' }}
+          />
+          <Stack.Screen 
+            name="Results" 
+            component={ResultsScreen} 
+            options={{ title: 'Results' }}
           />
           <Stack.Screen 
             name="MovieDetail" 
