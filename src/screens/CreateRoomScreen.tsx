@@ -78,7 +78,9 @@ export default function CreateRoomScreen() {
                   <Ionicons name="hourglass-outline" size={24} color="white" />
                 ) : selectedGenres.length > 0 ? (
                   <Ionicons name="rocket-outline" size={24} color="white" />
-                ) : null}
+                ) : (
+                  <View style={{ width: 24, height: 24 }} />
+                )}
                 <Text className="text-white font-semibold text-lg">
                   {isLoading
                     ? 'Creating...'
