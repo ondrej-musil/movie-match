@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Movie, Room, Match, UserSwipe } from '../types/movie';
 import { fetchTMDBMovies } from '../api/tmdb';
 import { db } from '../api/firebase';
-import { doc, setDoc, serverTimestamp, getDoc, updateDoc, arrayUnion, onSnapshot, Unsubscribe, collection, addDoc, onSnapshot as onColSnapshot, query, where, getDocs } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, getDoc, updateDoc, arrayUnion, onSnapshot, Unsubscribe, collection, addDoc, onSnapshot as onColSnapshot, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 
 interface MovieMatchState {
   // Current user
@@ -64,6 +64,17 @@ export const useMovieMatchStore = create<MovieMatchState>()(
       createRoom: async () => {
         const pin = generatePin();
         const { userId } = get();
+        // Clear existing room with the same pin (matches and swipes)
+        const roomRef = doc(db, 'rooms', pin);
+        const swipesRef = collection(db, 'rooms', pin, 'swipes');
+        const existingRoom = await getDoc(roomRef);
+        if (existingRoom.exists()) {
+          await updateDoc(roomRef, { matches: [], users: [], started: false });
+          const swipesSnap = await getDocs(swipesRef);
+          for (const swipeDoc of swipesSnap.docs) {
+            await deleteDoc(swipeDoc.ref);
+          }
+        }
         let movies = [];
         try {
           movies = await fetchTMDBMovies();
@@ -84,17 +95,71 @@ export const useMovieMatchStore = create<MovieMatchState>()(
           started: false,
         } as any;
         // Store in Firestore
-        await setDoc(doc(db, 'rooms', pin), {
+        await setDoc(roomRef, {
           ...newRoom,
           createdAt: serverTimestamp(),
           started: false,
           hostId: userId,
         });
-        set({ 
-          currentRoom: newRoom, 
+        // Set up real-time listener for room (host)
+        if (roomUnsubscribe) roomUnsubscribe();
+        roomUnsubscribe = onSnapshot(roomRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            set({
+              currentRoom: {
+                ...data,
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+              },
+              error: null
+            });
+          }
+        });
+        // Set up real-time listener for swipes (host)
+        if (swipesUnsubscribe) swipesUnsubscribe();
+        const swipesListenerRef = collection(db, 'rooms', pin, 'swipes');
+        swipesUnsubscribe = onColSnapshot(swipesListenerRef, async (snapshot) => {
+          const allSwipes = snapshot.docs.map(doc => doc.data());
+          set({ userSwipes: allSwipes.filter((s: any) => s.userId === userId) });
+          // Calculate matches: movies liked by at least two users
+          const roomSnap = await getDoc(roomRef);
+          let userIds: string[] = [];
+          let started = false;
+          if (roomSnap.exists()) {
+            const roomData = roomSnap.data();
+            userIds = roomData.users || [];
+            started = !!roomData.started;
+          }
+          if (started && userIds.length >= 2) {
+            const movieSwipes: Record<string, any[]> = {};
+            allSwipes.forEach((swipe: any) => {
+              if (!movieSwipes[swipe.movieId]) movieSwipes[swipe.movieId] = [];
+              movieSwipes[swipe.movieId].push(swipe);
+            });
+            const matches = Object.entries(movieSwipes)
+              .filter(([_, swipes]) => {
+                // Only create a match if at least two users liked the movie
+                if (swipes.length < 2) return false;
+                // All swipes must be liked
+                if (!swipes.every((swipe: any) => swipe.liked === true)) return false;
+                // All users in this match must be unique
+                const userIdsInMatch = swipes.map((swipe: any) => swipe.userId);
+                const uniqueUserIds = new Set(userIdsInMatch);
+                return uniqueUserIds.size >= 2;
+              })
+              .map(([movieId, swipes]) => ({
+                movieId,
+                users: swipes.map((s: any) => s.userId),
+                matchedAt: new Date(),
+              }));
+            // Update matches in Firestore if changed
+            await updateDoc(roomRef, { matches });
+          }
+        });
+        set({
           currentMovieIndex: 0,
           userSwipes: [],
-          error: null 
+          error: null
         });
         return pin;
       },
@@ -134,24 +199,40 @@ export const useMovieMatchStore = create<MovieMatchState>()(
             swipesUnsubscribe = onColSnapshot(swipesRef, async (snapshot) => {
               const allSwipes = snapshot.docs.map(doc => doc.data());
               set({ userSwipes: allSwipes.filter((s: any) => s.userId === userId) });
-              // Calculate matches: movies liked by all users
-              const userIds = roomData.users;
-              const movieLikes: Record<string, Set<string>> = {};
-              allSwipes.forEach((swipe: any) => {
-                if (swipe.liked) {
-                  if (!movieLikes[swipe.movieId]) movieLikes[swipe.movieId] = new Set();
-                  movieLikes[swipe.movieId].add(swipe.userId);
-                }
-              });
-              const matches = Object.entries(movieLikes)
-                .filter(([_, users]) => users.size === userIds.length)
-                .map(([movieId, users]) => ({
-                  movieId,
-                  users: Array.from(users),
-                  matchedAt: new Date(),
-                }));
-              // Update matches in Firestore if changed
-              await updateDoc(roomRef, { matches });
+              // Calculate matches: movies liked by at least two users
+              const roomSnap = await getDoc(roomRef);
+              let userIds: string[] = [];
+              let started = false;
+              if (roomSnap.exists()) {
+                const roomData = roomSnap.data();
+                userIds = roomData.users || [];
+                started = !!roomData.started;
+              }
+              if (started && userIds.length >= 2) {
+                const movieSwipes: Record<string, any[]> = {};
+                allSwipes.forEach((swipe: any) => {
+                  if (!movieSwipes[swipe.movieId]) movieSwipes[swipe.movieId] = [];
+                  movieSwipes[swipe.movieId].push(swipe);
+                });
+                const matches = Object.entries(movieSwipes)
+                  .filter(([_, swipes]) => {
+                    // Only create a match if at least two users liked the movie
+                    if (swipes.length < 2) return false;
+                    // All swipes must be liked
+                    if (!swipes.every((swipe: any) => swipe.liked === true)) return false;
+                    // All users in this match must be unique
+                    const userIdsInMatch = swipes.map((swipe: any) => swipe.userId);
+                    const uniqueUserIds = new Set(userIdsInMatch);
+                    return uniqueUserIds.size >= 2;
+                  })
+                  .map(([movieId, swipes]) => ({
+                    movieId,
+                    users: swipes.map((s: any) => s.userId),
+                    matchedAt: new Date(),
+                  }));
+                // Update matches in Firestore if changed
+                await updateDoc(roomRef, { matches });
+              }
             });
             set({
               currentRoom: {

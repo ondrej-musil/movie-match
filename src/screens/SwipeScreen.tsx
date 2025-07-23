@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Pressable, Alert, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -34,15 +34,25 @@ export default function SwipeScreen() {
   const matches = getMatches();
   const swipeStats = getSwipeStats();
 
+  // Track previous matches to show notification for new ones
+  const prevMatchesRef = useRef<any[]>([]);
+  const [newMatchTitle, setNewMatchTitle] = useState<string | null>(null);
+
   useEffect(() => {
-    // Check for new matches
-    const latestMatch = matches[matches.length - 1];
-    if (latestMatch && latestMatch.movieId !== lastMatchedMovie) {
-      setLastMatchedMovie(latestMatch.movieId);
+    const prevMatches = prevMatchesRef.current;
+    const prevIds = new Set(prevMatches.map(m => m.movieId));
+    const newMatches = matches.filter(m => !prevIds.has(m.movieId));
+    if (newMatches.length > 0) {
+      // Show notification for each new match (show the first one)
+      setNewMatchTitle(() => {
+        const movie = currentRoom?.movies.find(m => m.id === newMatches[0].movieId);
+        return movie ? movie.title : 'New Match!';
+      });
       setShowMatchNotification(true);
       setTimeout(() => setShowMatchNotification(false), 3000);
     }
-  }, [matches, lastMatchedMovie]);
+    prevMatchesRef.current = matches;
+  }, [matches, currentRoom]);
 
   // Set header title to Room pin (the room pin)
   useEffect(() => {
@@ -183,7 +193,7 @@ export default function SwipeScreen() {
         <View className="absolute top-20 left-4 right-4 bg-green-600 rounded-lg p-4 flex-row items-center space-x-3">
           <Ionicons name="heart" size={24} color="white" />
           <Text className="text-white font-semibold flex-1">
-            It's a match! 🎉
+            {newMatchTitle ? `It's a match for "${newMatchTitle}"! 🎉` : `It's a match! 🎉`}
           </Text>
         </View>
       )}
