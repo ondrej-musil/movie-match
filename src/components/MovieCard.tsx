@@ -268,13 +268,18 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
                         ))}
                       </View>
                     </View>
-                  ) : (providers.rent && providers.rent.length > 0 || providers.buy && providers.buy.length > 0) ? (
-                    <View>
-                      {providers.rent && providers.rent.length > 0 && (
-                        <>
-                          <Text className="text-gray-300 font-semibold mb-1 text-xs">Rent</Text>
+                  ) : ((() => {
+                    // Merge rent and buy providers into a single unique list
+                    const rentProviders = providers.rent || [];
+                    const buyProviders = providers.buy || [];
+                    const allProviders = [...rentProviders, ...buyProviders];
+                    const uniqueProviders = allProviders.filter((prov: any, idx: number, arr: any[]) => arr.findIndex(p => p.provider_id === prov.provider_id) === idx);
+                    if (uniqueProviders.length > 0) {
+                      return (
+                        <View>
+                          <Text className="text-gray-300 font-semibold mb-1 text-xs">Rent and Buy services:</Text>
                           <View className="flex-row flex-wrap items-center">
-                            {providers.rent.slice(0, 3).map((prov: any) => (
+                            {uniqueProviders.slice(0, 3).map((prov: any) => (
                               <View
                                 key={prov.provider_id}
                                 className="bg-yellow-700 rounded-full px-3 py-1 mr-2 mb-1"
@@ -284,28 +289,11 @@ export default function MovieCard({ movie, onSwipe, onTap, isVisible }: MovieCar
                               </View>
                             ))}
                           </View>
-                        </>
-                      )}
-                      {providers.buy && providers.buy.length > 0 && (
-                        <>
-                          <Text className="text-gray-300 font-semibold mb-1 text-xs">Buy</Text>
-                          <View className="flex-row flex-wrap items-center">
-                            {providers.buy.slice(0, 3).map((prov: any) => (
-                              <View
-                                key={prov.provider_id}
-                                className="bg-green-700 rounded-full px-3 py-1 mr-2 mb-1"
-                                style={{ minHeight: 24, justifyContent: 'center' }}
-                              >
-                                <Text className="text-xs text-white" style={{ lineHeight: 16 }}>{prov.provider_name}</Text>
-                              </View>
-                            ))}
-                          </View>
-                        </>
-                      )}
-                    </View>
-                  ) : (
-                    <Text className="text-gray-400 text-xs">I couldn’t find where to watch this movie.</Text>
-                  )
+                        </View>
+                      );
+                    }
+                    return <Text className="text-gray-400 text-xs">I couldn’t find where to watch this movie.</Text>;
+                  })())
                 ) : (
                   <Text className="text-gray-400 text-xs">I couldn’t find where to watch this movie.</Text>
                 )}
