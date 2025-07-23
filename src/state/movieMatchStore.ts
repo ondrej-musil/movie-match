@@ -23,7 +23,7 @@ interface MovieMatchState {
   
   // Actions
   setUserId: (id: string) => void;
-  createRoom: () => Promise<string>;
+  createRoom: (genres?: number[]) => Promise<string>;
   joinRoom: (pin: string) => Promise<boolean>;
   leaveRoom: () => void;
   swipeMovie: (movieId: string, liked: boolean) => void;
@@ -61,7 +61,7 @@ export const useMovieMatchStore = create<MovieMatchState>()(
 
       setUserId: (id: string) => set({ userId: id }),
 
-      createRoom: async () => {
+      createRoom: async (genres?: number[]) => {
         const pin = generatePin();
         const { userId } = get();
         // Clear existing room with the same pin (matches and swipes)
@@ -77,7 +77,7 @@ export const useMovieMatchStore = create<MovieMatchState>()(
         }
         let movies = [];
         try {
-          movies = await fetchTMDBMovies();
+          movies = await fetchTMDBMovies(genres);
         } catch (e) {
           // fallback to mockMovies if TMDB fetch fails
           const { mockMovies } = await import('../data/mockMovies');

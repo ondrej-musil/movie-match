@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useMovieMatchStore } from '../state/movieMatchStore';
 import { Ionicons } from '@expo/vector-icons';
+import { GENRE_MAP } from '../api/tmdb';
 
 type CreateRoomScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'CreateRoom'>;
 
@@ -14,17 +15,26 @@ export default function CreateRoomScreen() {
   const { createRoom } = useMovieMatchStore();
   const [roomPin, setRoomPin] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
 
   const handleCreateRoom = async () => {
     setIsLoading(true);
     try {
-      const pin = await createRoom();
+      const pin = await createRoom(selectedGenres);
       navigation.navigate('WaitingRoom', { pin });
     } catch (error) {
       Alert.alert('Error', 'Failed to create room. Please try again.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleToggleGenre = (genreId: number) => {
+    setSelectedGenres((prev) =>
+      prev.includes(genreId)
+        ? prev.filter((id) => id !== genreId)
+        : [...prev, genreId]
+    );
   };
 
   const handleStartSwiping = () => {
@@ -44,6 +54,26 @@ export default function CreateRoomScreen() {
               <Text className="text-gray-400 text-center mt-2 text-lg">
                 Start a new movie matching session
               </Text>
+            </View>
+
+            {/* Genre Selection UI */}
+            <View className="w-full mb-8">
+              <Text className="text-white text-lg font-semibold mb-3 text-center">Select Genres (optional)</Text>
+              <View className="flex-row flex-wrap justify-center">
+                {Object.entries(GENRE_MAP).map(([id, name]) => (
+                  <Pressable
+                    key={id}
+                    onPress={() => handleToggleGenre(Number(id))}
+                    className={`px-4 py-2 rounded-full mr-2 mb-2 border-2 ${
+                      selectedGenres.includes(Number(id))
+                        ? 'bg-red-600 border-red-400'
+                        : 'bg-gray-800 border-gray-700'
+                    }`}
+                  >
+                    <Text className={`text-sm font-semibold ${selectedGenres.includes(Number(id)) ? 'text-white' : 'text-gray-300'}`}>{name}</Text>
+                  </Pressable>
+                ))}
+              </View>
             </View>
 
             <View className="w-full">

@@ -155,7 +155,7 @@ export default function MovieDetailScreen() {
                           <View
                             key={prov.provider_id}
                             className="bg-yellow-700 rounded-full px-3 py-1 mr-2 mb-2"
-                            style={{ minHeight: 28, justifyContent: 'center' }}
+                            style={{ minHight: 28, justifyContent: 'center' }}
                           >
                             <Text className="text-xs text-white" style={{ lineHeight: 18 }}>{prov.provider_name}</Text>
                           </View>
