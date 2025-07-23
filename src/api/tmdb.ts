@@ -27,16 +27,28 @@ const GENRE_MAP: { [id: number]: string } = {
 };
 
 export async function fetchTMDBMovies(): Promise<Movie[]> {
-  const res = await fetch(TMDB_API_URL, {
+  // Fetch page 1
+  const res1 = await fetch(TMDB_API_URL + '&page=1', {
     headers: {
       'Authorization': TMDB_AUTH_HEADER,
       'accept': 'application/json',
     },
   });
-  if (!res.ok) throw new Error('Failed to fetch movies from TMDB');
-  const data = await res.json();
+  if (!res1.ok) throw new Error('Failed to fetch movies from TMDB (page 1)');
+  const data1 = await res1.json();
+  // Fetch page 2
+  const res2 = await fetch(TMDB_API_URL + '&page=2', {
+    headers: {
+      'Authorization': TMDB_AUTH_HEADER,
+      'accept': 'application/json',
+    },
+  });
+  if (!res2.ok) throw new Error('Failed to fetch movies from TMDB (page 2)');
+  const data2 = await res2.json();
+  // Combine results and slice to 30
+  const allResults = [...data1.results, ...data2.results].slice(0, 30);
   // Map TMDB movie objects to local Movie type
-  return data.results.map((m: any) => ({
+  return allResults.map((m: any) => ({
     id: m.id.toString(),
     title: m.title,
     year: m.release_date ? parseInt(m.release_date.slice(0, 4)) : 0,
