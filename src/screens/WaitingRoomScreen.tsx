@@ -65,10 +65,10 @@ export default function WaitingRoomScreen() {
               message: `Join my Movie Matcher room! Use PIN: ${pin}`,
             });
           }}
-          className="bg-blue-600 rounded-lg py-2 px-4 flex-row items-center justify-center mt-6"
+          className="border-2 border-gray-400 rounded-full py-3 px-6 flex-row items-center justify-center mt-6"
         >
-          <Ionicons name="share-outline" size={20} color="white" style={{ marginRight: 6 }} />
-          <Text className="text-white font-semibold text-base">Share</Text>
+          <Ionicons name="share-outline" size={26} color="#9CA3AF" style={{ marginRight: 10 }} />
+          <Text className="text-gray-300 font-semibold text-lg">Share</Text>
         </Pressable>
       </View>
       <View className="flex-row items-center mb-2">
