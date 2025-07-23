@@ -56,7 +56,7 @@ export default function CreateRoomScreen() {
                     onPress={() => handleToggleGenre(Number(id))}
                     className={`px-5 py-2.5 rounded-full mr-2.5 mb-2.5 border-2 ${
                       selectedGenres.includes(Number(id))
-                        ? 'bg-red-600 border-red-400'
+                        ? 'bg-red-600 border-red-600'
                         : 'bg-gray-800 border-gray-700'
                     }`}
                   >
