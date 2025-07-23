@@ -44,6 +44,13 @@ export default function SwipeScreen() {
     }
   }, [matches, lastMatchedMovie]);
 
+  // Set header title to Room pin (the room pin)
+  useEffect(() => {
+    if (currentRoom?.pin) {
+      navigation.setOptions({ title: `Room pin: ${currentRoom.pin}` });
+    }
+  }, [currentRoom?.pin, navigation]);
+
   const handleSwipe = (liked: boolean) => {
     if (!currentMovie) return;
 

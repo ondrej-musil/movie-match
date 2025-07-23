@@ -175,11 +175,11 @@ export const useMovieMatchStore = create<MovieMatchState>()(
             isActive: true,
             createdAt: new Date(),
           };
-          set({
-            currentRoom: mockRoom,
+          set({ 
+            currentRoom: mockRoom, 
             currentMovieIndex: 0,
             userSwipes: [],
-            error: null
+            error: null 
           });
           return true;
         }

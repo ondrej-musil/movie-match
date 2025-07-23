@@ -48,7 +48,7 @@ export async function fetchTMDBMovies(): Promise<Movie[]> {
     cast: [],     // Not available in discover endpoint
     duration: 0,  // Not available in discover endpoint
   }));
-}
+} 
 
 export async function fetchWatchProviders(movieId: number | string) {
   const res = await fetch(

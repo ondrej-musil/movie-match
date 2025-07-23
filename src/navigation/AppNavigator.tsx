@@ -39,49 +39,49 @@ export default function AppNavigator() {
         },
       }}
     >
-      <Stack.Screen 
-        name="Home" 
-        component={HomeScreen} 
-        options={{ title: 'Movie Match' }}
-      />
-      <Stack.Screen 
-        name="CreateRoom" 
-        component={CreateRoomScreen} 
-        options={{ title: 'Create Room' }}
-      />
-      <Stack.Screen 
-        name="JoinRoom" 
-        component={JoinRoomScreen} 
-        options={{ title: 'Join Room' }}
-      />
+          <Stack.Screen 
+            name="Home" 
+            component={HomeScreen} 
+            options={{ title: 'Movie Match' }}
+          />
+          <Stack.Screen 
+            name="CreateRoom" 
+            component={CreateRoomScreen} 
+            options={{ title: 'Create Room' }}
+          />
+          <Stack.Screen 
+            name="JoinRoom" 
+            component={JoinRoomScreen} 
+            options={{ title: 'Join Room' }}
+          />
       <Stack.Screen
         name="WaitingRoom"
         component={WaitingRoomScreen}
         options={{ title: 'Waiting Room' }}
       />
-      <Stack.Screen 
-        name="Swipe" 
-        component={SwipeScreen} 
-        options={{ 
+          <Stack.Screen 
+            name="Swipe" 
+            component={SwipeScreen} 
+            options={{ 
           title: 'Swipe',
-          headerLeft: () => null,
-          gestureEnabled: false,
-        }}
-      />
-      <Stack.Screen 
-        name="Matches" 
-        component={MatchesScreen} 
-        options={{ title: 'Matches' }}
-      />
-      <Stack.Screen 
-        name="MovieDetail" 
-        component={MovieDetailScreen} 
-        options={{ 
-          title: 'Movie Details',
-          presentation: 'modal',
-          headerShown: false,
-        }}
-      />
+              headerLeft: () => null,
+              gestureEnabled: false,
+            }}
+          />
+          <Stack.Screen 
+            name="Matches" 
+            component={MatchesScreen} 
+            options={{ title: 'Matches' }}
+          />
+          <Stack.Screen 
+            name="MovieDetail" 
+            component={MovieDetailScreen} 
+            options={{ 
+              title: 'Movie Details',
+              presentation: 'modal',
+              headerShown: false,
+            }}
+          />
     </Stack.Navigator>
   );
 }
