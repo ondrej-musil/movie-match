@@ -216,3 +216,19 @@ export async function fetchWatchProviders(movieId: number | string) {
   // Prioritize US providers
   return data.results?.US || null;
 } 
+
+export async function fetchDirectorAndCast(movieId: number | string): Promise<{ director: string; cast: string[] }> {
+  const res = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits`, {
+    headers: {
+      Authorization: TMDB_AUTH_HEADER,
+      accept: 'application/json',
+    },
+  });
+  if (!res.ok) throw new Error('Failed to fetch credits');
+  const data = await res.json();
+  // Find director
+  const director = (data.crew || []).find((c: any) => c.job === 'Director')?.name || '';
+  // Get top 5 cast
+  const cast = (data.cast || []).slice(0, 5).map((c: any) => c.name);
+  return { director, cast };
+} 

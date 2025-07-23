@@ -66,7 +66,7 @@ export default function SwipeScreen() {
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     swipeMovie(currentMovie.id, liked);
-
+    
     if (isLastMovie) {
       // Wait for animation, then navigate to Results
       setTimeout(() => {

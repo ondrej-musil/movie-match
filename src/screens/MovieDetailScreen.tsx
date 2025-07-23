@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Movie } from '../types/movie';
 import * as Haptics from 'expo-haptics';
-import { fetchWatchProviders } from '../api/tmdb';
+import { fetchWatchProviders, fetchDirectorAndCast } from '../api/tmdb';
 
 const { width } = Dimensions.get('window');
 
@@ -18,6 +18,10 @@ export default function MovieDetailScreen() {
   const [providers, setProviders] = useState<any>(null);
   const [loadingProviders, setLoadingProviders] = useState(true);
   const [errorProviders, setErrorProviders] = useState<string | null>(null);
+  const [director, setDirector] = useState<string>('');
+  const [cast, setCast] = useState<string[]>([]);
+  const [loadingCredits, setLoadingCredits] = useState(true);
+  const [errorCredits, setErrorCredits] = useState<string | null>(null);
 
   useEffect(() => {
     setLoadingProviders(true);
@@ -29,6 +33,20 @@ export default function MovieDetailScreen() {
       .catch((err) => {
         setErrorProviders('Could not load watch providers');
         setLoadingProviders(false);
+      });
+  }, [movie.id]);
+
+  useEffect(() => {
+    setLoadingCredits(true);
+    fetchDirectorAndCast(movie.id)
+      .then(({ director, cast }) => {
+        setDirector(director);
+        setCast(cast);
+        setLoadingCredits(false);
+      })
+      .catch((err) => {
+        setErrorCredits('Could not load credits');
+        setLoadingCredits(false);
       });
   }, [movie.id]);
 
@@ -99,19 +117,35 @@ export default function MovieDetailScreen() {
           {/* Director */}
           <View className="mb-6">
             <Text className="text-white text-lg font-semibold mb-2">Director</Text>
-            <Text className="text-gray-300 text-base">{movie.director}</Text>
+            {loadingCredits ? (
+              <Text className="text-gray-400 text-base">Loading...</Text>
+            ) : errorCredits ? (
+              <Text className="text-red-400 text-base">{errorCredits}</Text>
+            ) : (
+              <Text className="text-gray-300 text-base">{director || 'Unknown'}</Text>
+            )}
           </View>
 
           {/* Cast */}
           <View className="mb-6">
             <Text className="text-white text-lg font-semibold mb-2">Cast</Text>
-            <View className="flex-row flex-wrap">
-              {movie.cast.map((actor, index) => (
-                <View key={index} className="mr-4 mb-2">
-                  <Text className="text-gray-300 text-base">{actor}</Text>
-                </View>
-              ))}
-            </View>
+            {loadingCredits ? (
+              <Text className="text-gray-400 text-base">Loading...</Text>
+            ) : errorCredits ? (
+              <Text className="text-red-400 text-base">{errorCredits}</Text>
+            ) : (
+              <View className="flex-row flex-wrap">
+                {cast.length === 0 ? (
+                  <Text className="text-gray-300 text-base">Unknown</Text>
+                ) : (
+                  cast.map((actor, index) => (
+                    <View key={index} className="mr-4 mb-2">
+                      <Text className="text-gray-300 text-base">{actor}</Text>
+                    </View>
+                  ))
+                )}
+              </View>
+            )}
           </View>
 
           {/* Watch Providers */}
