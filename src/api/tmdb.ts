@@ -27,39 +27,43 @@ const GENRE_MAP: { [id: number]: string } = {
 };
 
 export async function fetchTMDBMovies(): Promise<Movie[]> {
-  // Fetch page 1
-  const res1 = await fetch(TMDB_API_URL + '&page=1', {
-    headers: {
-      'Authorization': TMDB_AUTH_HEADER,
-      'accept': 'application/json',
-    },
-  });
-  if (!res1.ok) throw new Error('Failed to fetch movies from TMDB (page 1)');
-  const data1 = await res1.json();
-  // Fetch page 2
-  const res2 = await fetch(TMDB_API_URL + '&page=2', {
-    headers: {
-      'Authorization': TMDB_AUTH_HEADER,
-      'accept': 'application/json',
-    },
-  });
-  if (!res2.ok) throw new Error('Failed to fetch movies from TMDB (page 2)');
-  const data2 = await res2.json();
-  // Combine results and slice to 30
-  const allResults = [...data1.results, ...data2.results].slice(0, 30);
-  // Map TMDB movie objects to local Movie type
-  return allResults.map((m: any) => ({
-    id: m.id.toString(),
-    title: m.title,
-    year: m.release_date ? parseInt(m.release_date.slice(0, 4)) : 0,
-    genre: (m.genre_ids || []).map((id: number) => GENRE_MAP[id] || 'Unknown'),
-    rating: m.vote_average ? Math.round(m.vote_average * 10) / 10 : 0,
-    description: m.overview || '',
-    poster: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : '',
-    director: '', // Not available in discover endpoint
-    cast: [],     // Not available in discover endpoint
-    duration: 0,  // Not available in discover endpoint
-  }));
+  // Pick 30 unique random page numbers from 1 to 60
+  const pageNumbers = Array.from({ length: 60 }, (_, i) => i + 1);
+  for (let i = pageNumbers.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pageNumbers[i], pageNumbers[j]] = [pageNumbers[j], pageNumbers[i]];
+  }
+  const selectedPages = pageNumbers.slice(0, 30);
+
+  // Fetch the first movie from each selected page
+  const movies: Movie[] = [];
+  for (const page of selectedPages) {
+    const res = await fetch(TMDB_API_URL + `&page=${page}`, {
+      headers: {
+        'Authorization': TMDB_AUTH_HEADER,
+        'accept': 'application/json',
+      },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.results && data.results.length > 0) {
+        const m = data.results[0];
+        movies.push({
+          id: m.id.toString(),
+          title: m.title,
+          year: m.release_date ? parseInt(m.release_date.slice(0, 4)) : 0,
+          genre: (m.genre_ids || []).map((id: number) => GENRE_MAP[id] || 'Unknown'),
+          rating: m.vote_average ? Math.round(m.vote_average * 10) / 10 : 0,
+          description: m.overview || '',
+          poster: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : '',
+          director: '', // Not available in discover endpoint
+          cast: [],     // Not available in discover endpoint
+          duration: 0,  // Not available in discover endpoint
+        });
+      }
+    }
+  }
+  return movies;
 } 
 
 export async function fetchWatchProviders(movieId: number | string) {
