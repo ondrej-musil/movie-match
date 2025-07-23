@@ -70,15 +70,15 @@ export default function MovieDetailScreen() {
             <Text className="text-white text-3xl font-bold mb-2">
               {movie.title}
             </Text>
-            <View className="flex-row items-center">
+            <View className="flex-row items-center mb-1">
               <Ionicons name="star" size={20} color="#fbbf24" />
               <Text className="text-yellow-400 text-lg font-semibold ml-2">
                 {movie.rating}
               </Text>
-              <Text className="text-gray-400 text-lg ml-4">
-                {movie.year} • {movie.duration}min
-              </Text>
             </View>
+            <Text className="text-gray-400 text-lg">
+              {movie.year} • {movie.duration === 0 ? 'I couldn’t find how long the movie is.' : `${movie.duration}min`}
+            </Text>
           </View>
 
           {/* Genres */}
@@ -116,7 +116,6 @@ export default function MovieDetailScreen() {
 
           {/* Watch Providers */}
           <View className="mb-8">
-            <Text className="text-white text-lg font-semibold mb-2">Where to Watch <Text className="text-xs text-gray-400">(Powered by JustWatch)</Text></Text>
             {loadingProviders && (
               <Text className="text-gray-400">Loading providers...</Text>
             )}
@@ -127,7 +126,7 @@ export default function MovieDetailScreen() {
               <>
                 {providers.flatrate && providers.flatrate.length > 0 && (
                   <View className="mb-2">
-                    <Text className="text-gray-300 font-semibold mb-1">Streaming</Text>
+                    <Text className="text-white text-lg font-semibold mb-1">Streaming</Text>
                     <View className="flex-row flex-wrap items-center">
                       {providers.flatrate.map((prov: any) => (
                         <View
@@ -143,7 +142,7 @@ export default function MovieDetailScreen() {
                 )}
                 {providers.rent && providers.rent.length > 0 && (
                   <View className="mb-2">
-                    <Text className="text-gray-300 font-semibold mb-1">Rent</Text>
+                    <Text className="text-white text-lg font-semibold mb-1">Rent</Text>
                     <View className="flex-row flex-wrap items-center">
                       {providers.rent.map((prov: any) => (
                         <View
@@ -159,7 +158,7 @@ export default function MovieDetailScreen() {
                 )}
                 {providers.buy && providers.buy.length > 0 && (
                   <View className="mb-2">
-                    <Text className="text-gray-300 font-semibold mb-1">Buy</Text>
+                    <Text className="text-white text-lg font-semibold mb-1">Buy</Text>
                     <View className="flex-row flex-wrap items-center">
                       {providers.buy.map((prov: any) => (
                         <View
@@ -174,12 +173,7 @@ export default function MovieDetailScreen() {
                   </View>
                 )}
                 {!providers.flatrate && !providers.rent && !providers.buy && (
-                  <Text className="text-gray-400">No providers found for this movie in the US.</Text>
-                )}
-                {providers.link && (
-                  <Text className="text-xs text-blue-400 mt-2" selectable>
-                    More info: {providers.link}
-                  </Text>
+                  <Text className="text-gray-400">I couldn’t find where to watch this movie.</Text>
                 )}
               </>
             )}
