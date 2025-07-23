@@ -46,19 +46,9 @@ export default function CreateRoomScreen() {
       <View className="flex-1 justify-center items-center px-6">
         {!roomPin ? (
           <>
-            <View className="items-center mb-12">
-              <Ionicons name="add-circle-outline" size={80} color="#ef4444" />
-              <Text className="text-3xl font-bold text-white mt-4">
-                Create Room
-              </Text>
-              <Text className="text-gray-400 text-center mt-2 text-lg">
-                Start a new movie matching session
-              </Text>
-            </View>
-
             {/* Genre Selection UI */}
             <View className="w-full mb-8">
-              <Text className="text-white text-lg font-semibold mb-3 text-center">Select Genres (optional)</Text>
+              <Text className="text-white text-3xl font-bold mb-6 text-center">Select Genres</Text>
               <View className="flex-row flex-wrap justify-center">
                 {Object.entries(GENRE_MAP).map(([id, name]) => (
                   <Pressable
