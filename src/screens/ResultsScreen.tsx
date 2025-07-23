@@ -36,10 +36,10 @@ export default function ResultsScreen() {
         <Text className="text-white text-2xl font-bold">Results</Text>
         <Pressable
           onPress={handleGoHome}
-          className="bg-gray-700 rounded-lg py-2 px-4 flex-row items-center justify-center"
+          className="bg-red-600 rounded-lg py-2 px-4 flex-row items-center justify-center"
         >
           <Ionicons name="home" size={20} color="white" />
-          <Text className="text-white font-semibold text-lg ml-2">Go Home</Text>
+          <Text className="text-white font-semibold text-lg ml-2">Go Back Home</Text>
         </Pressable>
       </View>
       <FlatList
