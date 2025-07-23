@@ -74,13 +74,17 @@ export default function CreateRoomScreen() {
                   isLoading ? 'bg-gray-600' : 'bg-red-600'
                 }`}
               >
-                <Ionicons 
-                  name={isLoading ? "hourglass-outline" : "rocket-outline"} 
-                  size={24} 
-                  color="white" 
-                />
+                {isLoading ? (
+                  <Ionicons name="hourglass-outline" size={24} color="white" />
+                ) : selectedGenres.length > 0 ? (
+                  <Ionicons name="rocket-outline" size={24} color="white" />
+                ) : null}
                 <Text className="text-white font-semibold text-lg">
-                  {isLoading ? 'Creating...' : 'Create Room'}
+                  {isLoading
+                    ? 'Creating...'
+                    : selectedGenres.length === 0
+                      ? 'Skip'
+                      : 'Create Room'}
                 </Text>
               </Pressable>
             </View>
