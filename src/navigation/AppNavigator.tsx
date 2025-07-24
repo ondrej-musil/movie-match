@@ -17,7 +17,7 @@ export type RootStackParamList = {
   Home: undefined;
   CreateRoom: undefined;
   JoinRoom: undefined;
-  WaitingRoom: { pin: string };
+  WaitingRoom: { pin: string; selectedGenres?: number[] };
   Swipe: undefined;
   Matches: undefined;
   Results: undefined;

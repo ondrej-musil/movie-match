@@ -23,7 +23,7 @@ interface MovieMatchState {
   
   // Actions
   setUserId: (id: string) => void;
-  createRoom: (genres?: number[]) => Promise<string>;
+  createRoom: (genres?: number[], pinOverride?: string, skipMovieFetch?: boolean) => Promise<string>;
   joinRoom: (pin: string) => Promise<boolean>;
   leaveRoom: () => void;
   swipeMovie: (movieId: string, liked: boolean) => void;
@@ -61,8 +61,8 @@ export const useMovieMatchStore = create<MovieMatchState>()(
 
       setUserId: (id: string) => set({ userId: id }),
 
-      createRoom: async (genres?: number[]) => {
-        const pin = generatePin();
+      createRoom: async (genres?: number[], pinOverride?: string, skipMovieFetch?: boolean) => {
+        const pin = pinOverride || generatePin();
         const { userId } = get();
         // Clear existing room with the same pin (matches and swipes)
         const roomRef = doc(db, 'rooms', pin);
@@ -75,13 +75,15 @@ export const useMovieMatchStore = create<MovieMatchState>()(
             await deleteDoc(swipeDoc.ref);
           }
         }
-        let movies = [];
-        try {
-          movies = await fetchTMDBMovies(genres);
-        } catch (e) {
-          // fallback to mockMovies if TMDB fetch fails
-          const { mockMovies } = await import('../data/mockMovies');
-          movies = mockMovies;
+        let movies: Movie[] = [];
+        if (!skipMovieFetch) {
+          try {
+            movies = await fetchTMDBMovies(genres);
+          } catch (e) {
+            // fallback to mockMovies if TMDB fetch fails
+            const { mockMovies } = await import('../data/mockMovies');
+            movies = mockMovies;
+          }
         }
         const newRoom: Room = {
           id: 'room_' + Date.now(),
@@ -93,7 +95,7 @@ export const useMovieMatchStore = create<MovieMatchState>()(
           isActive: true,
           createdAt: new Date(),
           started: false,
-        } as any;
+        };
         // Store in Firestore
         await setDoc(roomRef, {
           ...newRoom,
@@ -108,8 +110,15 @@ export const useMovieMatchStore = create<MovieMatchState>()(
             const data = docSnap.data();
             set({
               currentRoom: {
-                ...data,
+                id: data.id || '',
+                pin: data.pin || pin,
+                users: data.users || [],
+                hostId: data.hostId || '',
+                movies: data.movies || [],
+                matches: data.matches || [],
+                isActive: data.isActive !== undefined ? data.isActive : true,
                 createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+                started: data.started || false,
               },
               error: null
             });
@@ -120,7 +129,7 @@ export const useMovieMatchStore = create<MovieMatchState>()(
         const swipesListenerRef = collection(db, 'rooms', pin, 'swipes');
         swipesUnsubscribe = onColSnapshot(swipesListenerRef, async (snapshot) => {
           const allSwipes = snapshot.docs.map(doc => doc.data());
-          set({ userSwipes: allSwipes.filter((s: any) => s.userId === userId) });
+          set({ userSwipes: allSwipes.filter((s: any) => s.userId === userId) as UserSwipe[] });
           // Calculate matches: movies liked by at least two users
           const roomSnap = await getDoc(roomRef);
           let userIds: string[] = [];
@@ -186,8 +195,15 @@ export const useMovieMatchStore = create<MovieMatchState>()(
                 const data = docSnap.data();
                 set({
                   currentRoom: {
-                    ...data,
+                    id: data.id || '',
+                    pin: data.pin || pin,
+                    users: data.users || [],
+                    hostId: data.hostId || '',
+                    movies: data.movies || [],
+                    matches: data.matches || [],
+                    isActive: data.isActive !== undefined ? data.isActive : true,
                     createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+                    started: data.started || false,
                   },
                   error: null
                 });
@@ -198,7 +214,7 @@ export const useMovieMatchStore = create<MovieMatchState>()(
             const swipesRef = collection(db, 'rooms', pin, 'swipes');
             swipesUnsubscribe = onColSnapshot(swipesRef, async (snapshot) => {
               const allSwipes = snapshot.docs.map(doc => doc.data());
-              set({ userSwipes: allSwipes.filter((s: any) => s.userId === userId) });
+              set({ userSwipes: allSwipes.filter((s: any) => s.userId === userId) as UserSwipe[] });
               // Calculate matches: movies liked by at least two users
               const roomSnap = await getDoc(roomRef);
               let userIds: string[] = [];
@@ -236,8 +252,15 @@ export const useMovieMatchStore = create<MovieMatchState>()(
             });
             set({
               currentRoom: {
-                ...roomData,
+                id: roomData.id || '',
+                pin: roomData.pin || pin,
+                users: roomData.users || [],
+                hostId: roomData.hostId || '',
+                movies: roomData.movies || [],
+                matches: roomData.matches || [],
+                isActive: roomData.isActive !== undefined ? roomData.isActive : true,
                 createdAt: roomData.createdAt?.toDate ? roomData.createdAt.toDate() : new Date(),
+                started: roomData.started || false,
               },
               currentMovieIndex: 0,
               userSwipes: [],
@@ -255,6 +278,8 @@ export const useMovieMatchStore = create<MovieMatchState>()(
             matches: [],
             isActive: true,
             createdAt: new Date(),
+            hostId: userId,
+            started: false,
           };
           set({ 
             currentRoom: mockRoom, 

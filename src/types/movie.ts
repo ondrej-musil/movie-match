@@ -19,6 +19,8 @@ export interface Room {
   matches: Match[];
   isActive: boolean;
   createdAt: Date;
+  hostId: string;
+  started?: boolean;
 }
 
 export interface Match {

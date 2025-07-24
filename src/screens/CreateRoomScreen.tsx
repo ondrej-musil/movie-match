@@ -20,8 +20,10 @@ export default function CreateRoomScreen() {
   const handleCreateRoom = async () => {
     setIsLoading(true);
     try {
-      const pin = await createRoom(selectedGenres);
-      navigation.navigate('WaitingRoom', { pin });
+      // Generate a pin, create the room in Firestore with no movies yet
+      const pin = Math.floor(1000 + Math.random() * 9000).toString();
+      await createRoom(selectedGenres, pin, true); // true = skip movie fetching for now
+      navigation.navigate('WaitingRoom', { pin, selectedGenres });
     } catch (error) {
       Alert.alert('Error', 'Failed to create room. Please try again.');
     } finally {

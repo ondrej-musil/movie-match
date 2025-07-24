@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -9,6 +9,7 @@ import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { useMovieMatchStore } from '../state/movieMatchStore';
 import { Ionicons } from '@expo/vector-icons';
 import { Share } from 'react-native';
+import { fetchTMDBMovies } from '../api/tmdb';
 
 // Define the route prop type for this screen
  type WaitingRoomScreenRouteProp = RouteProp<RootStackParamList, 'WaitingRoom'>;
@@ -17,11 +18,14 @@ import { Share } from 'react-native';
 export default function WaitingRoomScreen() {
   const route = useRoute<WaitingRoomScreenRouteProp>();
   const navigation = useNavigation<WaitingRoomScreenNavigationProp>();
-  const { pin } = route.params;
+  const { pin, selectedGenres } = route.params;
   const userId = useMovieMatchStore(state => state.userId);
   const [started, setStarted] = useState(false);
   const [hostId, setHostId] = useState<string | null>(null);
   const [users, setUsers] = useState<string[]>([]);
+  const [isFetchingMovies, setIsFetchingMovies] = useState(false);
+  const [moviesReady, setMoviesReady] = useState(false);
+  const [startPressed, setStartPressed] = useState(false);
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, 'rooms', pin), (docSnap) => {
@@ -30,21 +34,44 @@ export default function WaitingRoomScreen() {
         setStarted(!!data.started);
         setHostId(data.hostId || null);
         setUsers(data.users || []);
+        setMoviesReady(!!data.movies && data.movies.length > 0);
+        // If host, room has no movies, and not already fetching, fetch movies
+        if (
+          userId === data.hostId &&
+          (!data.movies || data.movies.length === 0) &&
+          !isFetchingMovies
+        ) {
+          setIsFetchingMovies(true);
+          fetchTMDBMovies(selectedGenres)
+            .then(async (movies) => {
+              await updateDoc(doc(db, 'rooms', pin), { movies });
+            })
+            .finally(() => setIsFetchingMovies(false));
+        }
       }
     });
     return () => unsub();
-  }, [pin]);
+  }, [pin, userId, selectedGenres]);
 
   const handleStartGame = async () => {
-    await updateDoc(doc(db, 'rooms', pin), { started: true });
-    navigation.navigate('Swipe');
+    if (moviesReady) {
+      await updateDoc(doc(db, 'rooms', pin), { started: true });
+      navigation.navigate('Swipe');
+    } else {
+      setStartPressed(true);
+    }
   };
 
   useEffect(() => {
     if (started) {
       navigation.navigate('Swipe');
     }
-  }, [started, navigation]);
+    // If user pressed start and movies become ready, start the game
+    if (startPressed && moviesReady) {
+      setStartPressed(false);
+      handleStartGame();
+    }
+  }, [started, navigation, startPressed, moviesReady]);
 
   const isHost = userId === hostId;
 
@@ -83,9 +110,19 @@ export default function WaitingRoomScreen() {
           {isHost && (
             <Pressable
               onPress={handleStartGame}
-              className="bg-red-600 rounded-lg py-4 px-8 flex-row items-center justify-center"
+              disabled={startPressed && !moviesReady}
+              className={`rounded-lg py-4 px-8 flex-row items-center justify-center space-x-3 ${startPressed && !moviesReady ? 'bg-gray-600' : 'bg-red-600'}`}
             >
-              <Text className="text-white font-semibold text-lg">Start the Game</Text>
+              {(startPressed && !moviesReady) ? (
+                <Ionicons name="hourglass-outline" size={24} color="white" />
+              ) : (
+                <Ionicons name="play-circle-outline" size={24} color="white" />
+              )}
+              <Text className="text-white font-semibold text-lg">
+                {(startPressed && !moviesReady)
+                  ? 'Starting...'
+                  : 'Start the Game'}
+              </Text>
             </Pressable>
           )}
         </>
