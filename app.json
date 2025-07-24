@@ -14,10 +14,19 @@
       "backgroundColor": "#D32F2F"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "cz.moviematch",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "edgeToEdgeEnabled": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7e47f012-9bde-460a-8c15-a63eb5ed0302"
+      }
     }
   }
 }
