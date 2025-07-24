@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "movie-match",
-    "slug": "movie-match",
-    "scheme": "movie-match",
+    "name": "2-movie-match",
+    "slug": "2-movie-match",
+    "scheme": "2-movie-match",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
