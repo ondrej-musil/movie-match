@@ -3,7 +3,7 @@
     "name": "2-movie-match",
     "slug": "2-movie-match",
     "scheme": "2-movie-match",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -18,10 +18,12 @@
       "bundleIdentifier": "cz.moviematch",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "buildNumber": "9"
     },
     "android": {
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "versionCode": 9
     },
     "extra": {
       "eas": {
