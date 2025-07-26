@@ -4,8 +4,8 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web"
   },
   "dependencies": {
@@ -29,7 +29,7 @@
     "@react-navigation/native-stack": "^7.3.2",
     "@react-navigation/stack": "^7.1.1",
     "@shopify/flash-list": "1.7.6",
-    "@shopify/react-native-skia": "v2.0.0-next.4",
+    "@shopify/react-native-skia": "^2.1.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "expo": "^53.0.9",
