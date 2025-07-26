@@ -19,17 +19,25 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "12"
+      "buildNumber": "18"
     },
     "android": {
       "edgeToEdgeEnabled": true,
-      "versionCode": 12,
+      "versionCode": 18,
       "package": "cz.moviematch"
     },
     "extra": {
       "eas": {
         "projectId": "7e47f012-9bde-460a-8c15-a63eb5ed0302"
       }
-    }
+    },
+    "plugins": [
+      "expo-build-properties",
+      "expo-font",
+      "expo-mail-composer",
+      "expo-sqlite",
+      "expo-video",
+      "expo-web-browser"
+    ]
   }
 }
