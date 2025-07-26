@@ -17,9 +17,13 @@
       "supportsTablet": true,
       "bundleIdentifier": "cz.moviematch",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to provide location-based features.",
+        "NSContactsUsageDescription": "This app needs access to your contacts to enhance your experience.",
+        "NSCameraUsageDescription": "This app needs access to your camera to allow you to take photos or videos.",
+        "NSCalendarsUsageDescription": "This app needs access to your calendar to add and manage events."
       },
-      "buildNumber": "18"
+      "buildNumber": "22"
     },
     "android": {
       "edgeToEdgeEnabled": true,
