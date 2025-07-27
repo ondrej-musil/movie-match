@@ -27,7 +27,7 @@
     },
     "android": {
       "edgeToEdgeEnabled": true,
-      "versionCode": 18,
+      "versionCode": 19,
       "package": "cz.moviematch"
     },
     "extra": {
