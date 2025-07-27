@@ -23,7 +23,7 @@
         "NSCameraUsageDescription": "This app needs access to your camera to allow you to take photos or videos.",
         "NSCalendarsUsageDescription": "This app needs access to your calendar to add and manage events."
       },
-      "buildNumber": "29"
+      "buildNumber": "30"
     },
     "android": {
       "edgeToEdgeEnabled": true,
