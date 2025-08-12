@@ -23,16 +23,22 @@
         "NSCameraUsageDescription": "This app needs access to your camera to allow you to take photos or videos.",
         "NSCalendarsUsageDescription": "This app needs access to your calendar to add and manage events."
       },
-      "autoIncrement": true
+      "buildNumber": "31"
     },
     "android": {
       "edgeToEdgeEnabled": true,
-      "autoIncrement": true,
       "package": "cz.moviematch"
     },
     "extra": {
       "eas": {
         "projectId": "7e47f012-9bde-460a-8c15-a63eb5ed0302"
+      },
+      "expo": {
+        "doctor": {
+          "reactNativeDirectoryCheck": {
+            "listUnknownPackages": false
+          }
+        }
       }
     },
     "plugins": [
