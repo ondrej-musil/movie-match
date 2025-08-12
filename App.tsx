@@ -13,7 +13,7 @@ Before telling the user to add them, check if you already have access to the req
 Directly access them with process.env.${key}
 
 Correct usage:
-process.env.EXPO_PUBLIC_VIBECODE_{key}
+process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY
 //directly access the key
 
 Incorrect usage:
@@ -34,11 +34,24 @@ export default function App() {
   useEffect(() => {
     const initializeApp = async () => {
       try {
+        console.log('🚀 App initialization started');
+        
+        // Check if environment variables are loaded
+        console.log('📱 Environment check:', {
+          hasOpenAI: !!process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY,
+          hasAnthropic: !!process.env.EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY,
+          hasGoogle: !!process.env.EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY,
+          hasElevenLabs: !!process.env.EXPO_PUBLIC_VIBECODE_ELEVENLABS_API_KEY,
+        });
+
         // Add a small delay to ensure proper initialization
+        console.log('⏳ Waiting for initialization...');
         await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        console.log('✅ App initialization completed');
         setIsReady(true);
       } catch (err) {
-        console.error('App initialization error:', err);
+        console.error('❌ App initialization error:', err);
         setError('Failed to initialize app');
         // Still set ready to true so user can see error
         setIsReady(true);
@@ -49,14 +62,17 @@ export default function App() {
   }, []);
 
   if (!isReady) {
+    console.log('🔄 Showing loading screen');
     return (
       <View style={{ flex: 1, backgroundColor: '#D32F2F', justifyContent: 'center', alignItems: 'center' }}>
         <Text style={{ color: 'white', fontSize: 18 }}>Loading...</Text>
+        <Text style={{ color: 'white', fontSize: 14, marginTop: 10 }}>Please wait while we initialize the app</Text>
       </View>
     );
   }
 
   if (error) {
+    console.log('❌ Showing error screen:', error);
     return (
       <View style={{ flex: 1, backgroundColor: '#D32F2F', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
         <Text style={{ color: 'white', fontSize: 18, textAlign: 'center' }}>
@@ -65,10 +81,14 @@ export default function App() {
         <Text style={{ color: 'white', fontSize: 14, textAlign: 'center', marginTop: 10 }}>
           Please check your internet connection and try again.
         </Text>
+        <Text style={{ color: 'white', fontSize: 12, textAlign: 'center', marginTop: 10 }}>
+          If the problem persists, please contact support.
+        </Text>
       </View>
     );
   }
 
+  console.log('🎬 Rendering main app');
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
