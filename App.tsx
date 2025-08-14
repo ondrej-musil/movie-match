@@ -31,37 +31,54 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 function AppContent() {
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [logs, setLogs] = useState<string[]>([]);
+
+  // Fallback logging function
+  const addLog = (message: string) => {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = `[${timestamp}] ${message}`;
+    setLogs(prev => [...prev, logEntry]);
+    console.log(message);
+  };
 
   useEffect(() => {
     const initializeApp = async () => {
       try {
+        addLog('🚀 App initialization started');
+        
         // Initialize Sentry first
-        Sentry.init({
-          dsn: 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/4509841326211152',
-          sendDefaultPii: true,
-          replaysSessionSampleRate: 0.1,
-          replaysOnErrorSampleRate: 1,
-          integrations: [Sentry.mobileReplayIntegration()],
-        });
-
-        console.log('🚀 App initialization started');
+        addLog('🔧 Initializing Sentry...');
+        try {
+          Sentry.init({
+            dsn: 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/4509841326211152',
+            sendDefaultPii: true,
+            replaysSessionSampleRate: 0.1,
+            replaysOnErrorSampleRate: 1,
+            integrations: [Sentry.mobileReplayIntegration()],
+          });
+          addLog('✅ Sentry initialized successfully');
+        } catch (sentryError) {
+          addLog(`❌ Sentry initialization failed: ${sentryError}`);
+        }
         
         // Check if environment variables are loaded
-        console.log('📱 Environment check:', {
+        addLog('📱 Checking environment variables...');
+        const envCheck = {
           hasOpenAI: !!process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY,
           hasAnthropic: !!process.env.EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY,
           hasGoogle: !!process.env.EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY,
           hasElevenLabs: !!process.env.EXPO_PUBLIC_VIBECODE_ELEVENLABS_API_KEY,
-        });
+        };
+        addLog(`📱 Environment check: ${JSON.stringify(envCheck)}`);
 
         // Add a small delay to ensure proper initialization
-        console.log('⏳ Waiting for initialization...');
+        addLog('⏳ Waiting for initialization...');
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        console.log('✅ App initialization completed');
+        addLog('✅ App initialization completed');
         setIsReady(true);
       } catch (err) {
-        console.error('❌ App initialization error:', err);
+        addLog(`❌ App initialization error: ${err}`);
         setError('Failed to initialize app');
         // Still set ready to true so user can see error
         setIsReady(true);
@@ -77,6 +94,14 @@ function AppContent() {
       <View style={{ flex: 1, backgroundColor: '#D32F2F', justifyContent: 'center', alignItems: 'center' }}>
         <Text style={{ color: 'white', fontSize: 18 }}>Loading...</Text>
         <Text style={{ color: 'white', fontSize: 14, marginTop: 10 }}>Please wait while we initialize the app</Text>
+        <Button 
+          title="Test Sentry Now" 
+          onPress={() => { 
+            console.log('🧪 Manual Sentry test triggered');
+            Sentry.captureException(new Error('Manual test error from loading screen'));
+          }}
+          color="white"
+        />
       </View>
     );
   }
@@ -94,6 +119,21 @@ function AppContent() {
         <Text style={{ color: 'white', fontSize: 12, textAlign: 'center', marginTop: 10 }}>
           If the problem persists, please contact support.
         </Text>
+        
+        {/* Log Viewer */}
+        <View style={{ marginTop: 20, maxHeight: 200, width: '100%' }}>
+          <Text style={{ color: 'white', fontSize: 14, textAlign: 'center', marginBottom: 10 }}>
+            Debug Logs:
+          </Text>
+          <View style={{ backgroundColor: 'rgba(0,0,0,0.3)', padding: 10, borderRadius: 5, maxHeight: 150 }}>
+            {logs.map((log, index) => (
+              <Text key={index} style={{ color: 'white', fontSize: 10, marginBottom: 2 }}>
+                {log}
+              </Text>
+            ))}
+          </View>
+        </View>
+        
         <Button 
           title="Test Sentry" 
           onPress={() => { Sentry.captureException(new Error('Test error from error screen')) }}
