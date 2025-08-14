@@ -80,12 +80,40 @@ function AppContent() {
 
         // Add a small delay to ensure proper initialization
         addLog('⏳ Waiting for initialization...');
-        Sentry.captureMessage('⏳ Waiting for initialization...', 'info');
+        
+        try {
+          addLog('🔍 Attempting to send waiting message to Sentry...');
+          Sentry.captureMessage('⏳ Waiting for initialization...', 'info');
+          addLog('✅ Waiting message sent to Sentry successfully');
+        } catch (sentryError) {
+          addLog(`❌ Waiting message failed: ${sentryError}`);
+          Sentry.captureException(sentryError);
+        }
+        
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         addLog('✅ App initialization completed');
-        Sentry.captureMessage('✅ App initialization completed', 'info');
-        setIsReady(true);
+        
+        // Add specific error handling to pinpoint the crash
+        try {
+          addLog('🔍 Attempting to send Sentry message...');
+          Sentry.captureMessage('✅ App initialization completed', 'info');
+          addLog('✅ Sentry message sent successfully');
+        } catch (sentryError) {
+          addLog(`❌ Sentry message failed: ${sentryError}`);
+          Sentry.captureException(sentryError);
+        }
+        
+        try {
+          addLog('🔍 Attempting to set isReady to true...');
+          setIsReady(true);
+          addLog('✅ isReady set to true successfully');
+        } catch (stateError) {
+          addLog(`❌ Setting isReady failed: ${stateError}`);
+          Sentry.captureException(stateError);
+          // Still try to set ready so user can see the error
+          setIsReady(true);
+        }
       } catch (err) {
         addLog(`❌ App initialization error: ${err}`);
         Sentry.captureException(err);
