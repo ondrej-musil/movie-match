@@ -22,12 +22,29 @@ import { OPENAI_API_KEY } from '@env';
 
 Incorrect usage:
 import Constants from 'expo-constants';
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/4509841326211152',
+
+  // Adds more context data to events (IP address, cookies, user, etc.)
+  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  sendDefaultPii: true,
+
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration()],
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 const openai_api_key = Constants.expoConfig.extra.apikey;
 //don't use expo-constants, its depreicated
 
 */
 
-export default function App() {
+export default Sentry.wrap(function App() {
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -99,4 +116,4 @@ export default function App() {
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
-}
+});
