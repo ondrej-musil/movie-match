@@ -3,8 +3,20 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Button } from "react-native";
 import AppNavigator from "./src/navigation/AppNavigator";
+import * as Sentry from "@sentry/react-native";
+
+// Initialize Sentry
+Sentry.init({
+  dsn: 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/4509841326211152',
+  // Adds more context data to events (IP address, cookies, user, etc.)
+  sendDefaultPii: true,
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration()],
+});
 
 /*
 IMPORTANT NOTICE: DO NOT REMOVE
@@ -22,29 +34,12 @@ import { OPENAI_API_KEY } from '@env';
 
 Incorrect usage:
 import Constants from 'expo-constants';
-import * as Sentry from '@sentry/react-native';
-
-Sentry.init({
-  dsn: 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/4509841326211152',
-
-  // Adds more context data to events (IP address, cookies, user, etc.)
-  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
-  sendDefaultPii: true,
-
-  // Configure Session Replay
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1,
-  integrations: [Sentry.mobileReplayIntegration()],
-
-  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
-  // spotlight: __DEV__,
-});
 const openai_api_key = Constants.expoConfig.extra.apikey;
 //don't use expo-constants, its depreicated
 
 */
 
-export default Sentry.wrap(function App() {
+export default function App() {
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,6 +96,11 @@ export default Sentry.wrap(function App() {
         <Text style={{ color: 'white', fontSize: 12, textAlign: 'center', marginTop: 10 }}>
           If the problem persists, please contact support.
         </Text>
+        <Button 
+          title="Test Sentry" 
+          onPress={() => { Sentry.captureException(new Error('Test error from error screen')) }}
+          color="white"
+        />
       </View>
     );
   }
@@ -116,4 +116,4 @@ export default Sentry.wrap(function App() {
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
-});
+}
