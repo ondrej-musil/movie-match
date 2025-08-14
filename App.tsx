@@ -45,7 +45,6 @@ function AppContent() {
     const initializeApp = async () => {
       try {
         addLog('🚀 App initialization started');
-        Sentry.captureMessage('🚀 App initialization started', 'info');
         
         // Initialize Sentry first
         addLog('🔧 Initializing Sentry...');
@@ -147,7 +146,9 @@ function AppContent() {
         
         <Button 
           title="Test Sentry" 
-          onPress={() => { Sentry.captureException(new Error('Test error from error screen')) }}
+          onPress={() => { 
+            Sentry.captureException(new Error('Test error from error screen'));
+          }}
           color="white"
         />
       </View>

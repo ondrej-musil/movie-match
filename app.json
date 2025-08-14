@@ -55,7 +55,9 @@
         {
           "url": "https://sentry.io/",
           "project": "movie-match.cz",
-          "organization": "movie-matchcz"
+          "organization": "movie-matchcz",
+          "disableAutoUpload": true,
+          "uploadSourceMaps": false
         }
       ]
     ]
