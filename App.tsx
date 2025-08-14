@@ -7,17 +7,6 @@ import { View, Text, Button } from "react-native";
 import AppNavigator from "./src/navigation/AppNavigator";
 import * as Sentry from "@sentry/react-native";
 
-// Initialize Sentry
-Sentry.init({
-  dsn: 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/4509841326211152',
-  // Adds more context data to events (IP address, cookies, user, etc.)
-  sendDefaultPii: true,
-  // Configure Session Replay
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1,
-  integrations: [Sentry.mobileReplayIntegration()],
-});
-
 /*
 IMPORTANT NOTICE: DO NOT REMOVE
 There are already environment keys in the project. 
@@ -39,13 +28,22 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 
 */
 
-export default function App() {
+function AppContent() {
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const initializeApp = async () => {
       try {
+        // Initialize Sentry first
+        Sentry.init({
+          dsn: 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/4509841326211152',
+          sendDefaultPii: true,
+          replaysSessionSampleRate: 0.1,
+          replaysOnErrorSampleRate: 1,
+          integrations: [Sentry.mobileReplayIntegration()],
+        });
+
         console.log('🚀 App initialization started');
         
         // Check if environment variables are loaded
@@ -117,3 +115,6 @@ export default function App() {
     </GestureHandlerRootView>
   );
 }
+
+// Wrap the app with Sentry
+export default Sentry.wrap(AppContent);
