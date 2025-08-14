@@ -12,9 +12,12 @@
     "preview": {
       "distribution": "internal"
     },
-    "production": {
-      "autoIncrement": true
+      "production": {
+    "autoIncrement": true,
+    "env": {
+      "SENTRY_ALLOW_FAILURE": "true"
     }
+  }
   },
   "submit": {
     "production": {}
