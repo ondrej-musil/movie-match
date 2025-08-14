@@ -45,6 +45,7 @@ function AppContent() {
     const initializeApp = async () => {
       try {
         addLog('🚀 App initialization started');
+        Sentry.captureMessage('🚀 App initialization started', 'info');
         
         // Initialize Sentry first
         addLog('🔧 Initializing Sentry...');
@@ -57,12 +58,18 @@ function AppContent() {
             integrations: [Sentry.mobileReplayIntegration()],
           });
           addLog('✅ Sentry initialized successfully');
+          
+          // Test Sentry immediately to verify it's working
+          Sentry.captureMessage('🚀 App started successfully', 'info');
+          addLog('📤 Sent test message to Sentry');
         } catch (sentryError) {
           addLog(`❌ Sentry initialization failed: ${sentryError}`);
+          Sentry.captureException(sentryError);
         }
         
         // Check if environment variables are loaded
         addLog('📱 Checking environment variables...');
+        Sentry.captureMessage('📱 Checking environment variables...', 'info');
         const envCheck = {
           hasOpenAI: !!process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY,
           hasAnthropic: !!process.env.EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY,
@@ -70,15 +77,19 @@ function AppContent() {
           hasElevenLabs: !!process.env.EXPO_PUBLIC_VIBECODE_ELEVENLABS_API_KEY,
         };
         addLog(`📱 Environment check: ${JSON.stringify(envCheck)}`);
+        Sentry.setContext('environment', envCheck);
 
         // Add a small delay to ensure proper initialization
         addLog('⏳ Waiting for initialization...');
+        Sentry.captureMessage('⏳ Waiting for initialization...', 'info');
         await new Promise(resolve => setTimeout(resolve, 1000));
         
         addLog('✅ App initialization completed');
+        Sentry.captureMessage('✅ App initialization completed', 'info');
         setIsReady(true);
       } catch (err) {
         addLog(`❌ App initialization error: ${err}`);
+        Sentry.captureException(err);
         setError('Failed to initialize app');
         // Still set ready to true so user can see error
         setIsReady(true);
