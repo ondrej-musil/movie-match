@@ -1,37 +1,38 @@
 {
   "expo": {
-    "name": "2 Movie Match",
+    "name": "2-movie-match",
     "slug": "2-movie-match",
     "scheme": "movie-match-2",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#D32F2F"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "cz.moviematch.app",
+      "bundleIdentifier": "cz.moviematch",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "This app needs access to location to show nearby movie theaters and events.",
-        "NSContactsUsageDescription": "This app needs access to contacts to help you find friends who might be interested in the same movies.",
-        "NSCameraUsageDescription": "This app needs access to camera to scan QR codes and take photos for movie reviews.",
-        "NSCalendarsUsageDescription": "This app needs access to calendar to help you schedule movie watching events and reminders."
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to provide location-based features.",
+        "NSContactsUsageDescription": "This app needs access to your contacts to enhance your experience.",
+        "NSCameraUsageDescription": "This app needs access to your camera to allow you to take photos or videos.",
+        "NSCalendarsUsageDescription": "This app needs access to your calendar to add and manage events."
       },
       "buildNumber": "44"
     },
     "android": {
       "edgeToEdgeEnabled": true,
       "versionCode": 44,
-      "package": "cz.moviematch.app"
+      "package": "cz.moviematch"
     },
     "extra": {
       "eas": {
-        "projectId": "2-movie-match"
+        "projectId": "7e47f012-9bde-460a-8c15-a63eb5ed0302"
       },
       "expo": {
         "doctor": {
@@ -42,6 +43,12 @@
       }
     },
     "plugins": [
+      "expo-build-properties",
+      "expo-font",
+      "expo-mail-composer",
+      "expo-sqlite",
+      "expo-video",
+      "expo-web-browser",
       [
         "@sentry/react-native/expo",
         {
