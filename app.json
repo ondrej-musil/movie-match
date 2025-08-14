@@ -40,7 +40,8 @@
             "listUnknownPackages": false
           }
         }
-      }
+      },
+      "SENTRY_DISABLE_AUTO_UPLOAD": "true"
     },
     "plugins": [
       "expo-build-properties",
