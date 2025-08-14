@@ -53,7 +53,7 @@
         "@sentry/react-native/expo",
         {
           "url": "https://sentry.io/",
-          "project": "react-native",
+          "project": "movie-match.cz",
           "organization": "movie-matchcz"
         }
       ]
