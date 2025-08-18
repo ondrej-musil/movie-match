@@ -28,20 +28,32 @@ const openai_api_key = Constants.expoConfig.extra.apikey;
 
 */
 
-function AppContent() {
+function App() {
+  console.log('🚀 App component rendering...');
+  
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
+  console.log('📱 State initialized - isReady:', isReady, 'error:', error);
+
   // Fallback logging function
   const addLog = (message: string) => {
-    const timestamp = new Date().toLocaleTimeString();
-    const logEntry = `[${timestamp}] ${message}`;
-    setLogs(prev => [...prev, logEntry]);
-    console.log(message);
+    console.log('📝 addLog called with:', message);
+    try {
+      setLogs(prev => {
+        console.log('🔄 Updating logs array...');
+        const newLogs = [...prev, `${new Date().toISOString()}: ${message}`];
+        console.log('✅ Logs updated, new length:', newLogs.length);
+        return newLogs;
+      });
+    } catch (err) {
+      console.log('❌ Error in addLog:', err);
+    }
   };
 
   useEffect(() => {
+    console.log('🔧 useEffect triggered');
     const initializeApp = async () => {
       console.log('🚀 initializeApp function called');
       try {
@@ -224,4 +236,4 @@ function AppContent() {
 }
 
 // Wrap the app with Sentry
-export default Sentry.wrap(AppContent);
+export default Sentry.wrap(App);
