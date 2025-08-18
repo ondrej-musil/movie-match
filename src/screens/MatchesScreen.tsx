@@ -6,9 +6,13 @@ import { useNavigation } from '@react-navigation/native';
 import { useMovieMatchStore } from '../state/movieMatchStore';
 import { Ionicons } from '@expo/vector-icons';
 import { Movie } from '../types/movie';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function MatchesScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
   const { currentRoom, getMatches } = useMovieMatchStore();
   const matches = getMatches();
 
