@@ -114,16 +114,36 @@ function App() {
           Sentry.captureException(sentryError);
         }
         
-        console.log('📱 Starting environment check...');
-        // Check if environment variables are loaded
-        addLog('📱 Checking environment variables...');
-        Sentry.captureMessage('📱 Checking environment variables...', 'info');
-        const envCheck = {
-          hasOpenAI: !!process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY,
-          hasAnthropic: !!process.env.EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY,
-          hasGoogle: !!process.env.EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY,
-          hasElevenLabs: !!process.env.EXPO_PUBLIC_VIBECODE_ELEVENLABS_API_KEY,
-        };
+        console.log('📱 About to check environment variables...');
+        addLog('📱 About to check environment variables...');
+        
+        let envCheck;
+        try {
+          console.log('📱 Environment check starting...');
+          addLog('📱 Environment check starting...');
+          
+          // Check if environment variables are loaded
+          addLog('📱 Checking environment variables...');
+          Sentry.captureMessage('📱 Checking environment variables...', 'info');
+          
+          envCheck = {
+            hasOpenAI: !!process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY,
+            hasAnthropic: !!process.env.EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY,
+            hasGoogle: !!process.env.EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY,
+            hasElevenLabs: !!process.env.EXPO_PUBLIC_VIBECODE_ELEVENLABS_API_KEY,
+          };
+          
+          console.log('📱 Environment check completed successfully:', envCheck);
+          addLog('📱 Environment check completed successfully');
+          
+        } catch (error) {
+          console.log('❌ Environment check failed:', error);
+          addLog(`❌ Environment check failed: ${error}`);
+          Sentry.captureException(error);
+          throw error; // Re-throw to maintain the original flow
+        }
+        
+        // Now envCheck is accessible here
         console.log('📱 Environment check result:', envCheck);
         addLog(`📱 Environment check: ${JSON.stringify(envCheck)}`);
         Sentry.setContext('environment', envCheck);
