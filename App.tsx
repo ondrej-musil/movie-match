@@ -81,6 +81,33 @@ function App() {
           Sentry.captureMessage('🚀 App started successfully', 'info');
           console.log('✅ Test message sent');
           addLog('📤 Sent test message to Sentry');
+          
+          // Send additional automatic events to ensure Sentry is working
+          try {
+            Sentry.captureMessage('🔍 Testing Sentry integration', 'debug');
+            addLog('📤 Sent debug message to Sentry');
+            
+            // Set user context
+            Sentry.setUser({ id: 'test-user', email: 'test@example.com' });
+            addLog('👤 Set user context in Sentry');
+            
+            // Set extra context
+            Sentry.setExtra('app_version', '1.0.1');
+            Sentry.setExtra('build_number', '46');
+            addLog('📋 Set extra context in Sentry');
+            
+            // Send a breadcrumb
+            Sentry.addBreadcrumb({
+              category: 'app',
+              message: 'App initialization started',
+              level: 'info',
+            });
+            addLog('🍞 Added breadcrumb to Sentry');
+            
+          } catch (eventError) {
+            console.log('❌ Failed to send additional Sentry events:', eventError);
+            addLog(`❌ Failed to send additional Sentry events: ${eventError}`);
+          }
         } catch (sentryError) {
           console.log('❌ Sentry error:', sentryError);
           addLog(`❌ Sentry initialization failed: ${sentryError}`);
