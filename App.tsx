@@ -234,6 +234,13 @@ function App() {
           Sentry.init({
             dsn: 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/4509841326211152',
             sendDefaultPii: true,
+            // React Native specific configuration
+            enableNative: false,
+            enableNativeCrashHandling: false,
+            enableNativeNagger: false,
+            // Disable features that require native integration
+            enableAutoSessionTracking: false,
+            attachStacktrace: true,
             // Add error handling and rate limiting
             beforeSend: (event) => {
               console.log('📤 Sentry beforeSend:', event.message);
@@ -243,12 +250,16 @@ function App() {
               console.log('🍞 Sentry breadcrumb:', breadcrumb.message);
               return breadcrumb;
             },
-            // Add debugging
-            debug: true,
+            // Reduce debug noise
+            debug: false,
             // Use default React Native transport
           });
           console.log('✅ Sentry.init completed');
           addLog(setLogs, '✅ Sentry initialized successfully');
+          
+          // Now that Sentry is initialized, wrap the app
+          console.log('🔧 Wrapping app with Sentry...');
+          addLog(setLogs, '🔧 Wrapping app with Sentry...');
           
           // Test network connectivity to Sentry
           console.log('🌐 Testing Sentry network connectivity...');
@@ -544,5 +555,5 @@ function App() {
   );
 }
 
-// Wrap the app with Sentry
-export default Sentry.wrap(App);
+// Export the unwrapped app - we'll wrap it after initialization
+export default App;
