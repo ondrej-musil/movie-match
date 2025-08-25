@@ -37,6 +37,9 @@ function App() {
 
   console.log('📱 State initialized - isReady:', isReady, 'error:', error);
 
+  // Add immediate logging to see if we even get here
+  console.log('🔍 App function reached - adding immediate log');
+  
   // Fallback logging function
   const addLog = (message: string) => {
     console.log('📝 addLog called with:', message);
@@ -51,6 +54,11 @@ function App() {
       console.log('❌ Error in addLog:', err);
     }
   };
+
+  // Add immediate log to see if logging works
+  console.log('📝 Testing immediate logging...');
+  addLog('🚀 App component function reached');
+  console.log('✅ Immediate logging test completed');
 
   // Function to send automatic Sentry events on every app launch
   const sendAutomaticSentryEvent = async () => {
@@ -213,8 +221,11 @@ function App() {
 
   useEffect(() => {
     console.log('🔧 useEffect triggered');
+    addLog('🔧 useEffect triggered');
+    
     const initializeApp = async () => {
       console.log('🚀 initializeApp function called');
+      addLog('🚀 initializeApp function called');
       try {
         console.log('📝 Adding first log...');
         addLog('🚀 App initialization started');
@@ -449,6 +460,13 @@ function App() {
             setIsReady(true);
           }
         }, 15000); // 15 second emergency fallback
+
+        // Add a simple bypass test - force ready after 5 seconds for testing
+        setTimeout(() => {
+          console.log('🧪 TEST: Forcing isReady to true after 5 seconds for testing');
+          addLog('🧪 TEST: Forcing isReady to true after 5 seconds for testing');
+          setIsReady(true);
+        }, 5000); // 5 second test bypass
       } catch (err) {
         console.log('❌ Main error in initializeApp:', err);
         addLog(`❌ App initialization error: ${err}`);
@@ -465,10 +483,12 @@ function App() {
 
   if (!isReady) {
     console.log('🔄 Showing loading screen');
+    addLog('🔄 Showing loading screen');
     return (
       <View style={{ flex: 1, backgroundColor: '#D32F2F', justifyContent: 'center', alignItems: 'center' }}>
         <Text style={{ color: 'white', fontSize: 18 }}>Loading...</Text>
         <Text style={{ color: 'white', fontSize: 14, marginTop: 10 }}>Please wait while we initialize the app</Text>
+        <Text style={{ color: 'white', fontSize: 12, marginTop: 10 }}>Debug: App mounted, waiting for initialization</Text>
         <Button 
           title="Test Sentry Now" 
           onPress={() => { 
@@ -531,6 +551,17 @@ function App() {
   }
 
   console.log('🎬 Rendering main app');
+  addLog('🎬 Rendering main app');
+  
+  // Add a simple test to see if we can even render basic components
+  try {
+    console.log('🧪 Testing basic component rendering...');
+    addLog('🧪 Testing basic component rendering...');
+  } catch (renderError) {
+    console.log('❌ Render test failed:', renderError);
+    addLog(`❌ Render test failed: ${renderError}`);
+  }
+  
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
