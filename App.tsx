@@ -234,9 +234,6 @@ function App() {
           Sentry.init({
             dsn: 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/4509841326211152',
             sendDefaultPii: true,
-            replaysSessionSampleRate: 0.1,
-            replaysOnErrorSampleRate: 1,
-            integrations: [Sentry.mobileReplayIntegration()],
             // Add error handling and rate limiting
             beforeSend: (event) => {
               console.log('📤 Sentry beforeSend:', event.message);
