@@ -20,6 +20,18 @@ Sentry.init({
   attachStacktrace: true,
   // Reduce debug noise
   debug: false,
+  // Add proper error handling
+  beforeSend: (event) => {
+    console.log('📤 Sentry beforeSend:', event.message);
+    return event;
+  },
+  beforeBreadcrumb: (breadcrumb) => {
+    console.log('🍞 Sentry breadcrumb:', breadcrumb.message);
+    return breadcrumb;
+  },
+  // Add transport configuration
+  transport: undefined, // Use default transport
+
 });
 
 /*
@@ -264,9 +276,15 @@ function App() {
         try {
           // Add small delay to prevent overwhelming Sentry
           await new Promise(resolve => setTimeout(resolve, 100));
-          Sentry.captureMessage('🚀 App started successfully', 'info');
-          console.log('✅ Test message sent');
-          addLog(setLogs, '📤 Sent test message to Sentry');
+          // Add proper error handling for Sentry calls
+          try {
+            Sentry.captureMessage('🚀 App started successfully', 'info');
+            console.log('✅ Test message sent');
+            addLog(setLogs, '📤 Sent test message to Sentry');
+          } catch (sentryError) {
+            console.log('❌ Sentry captureMessage failed:', sentryError);
+            addLog(setLogs, `❌ Sentry captureMessage failed: ${sentryError}`);
+          }
         } catch (error) {
           console.log('❌ Test message failed:', error);
           addLog(setLogs, `❌ Test message failed: ${error}`);
@@ -274,25 +292,46 @@ function App() {
         
         // Send additional automatic events to ensure Sentry is working
         try {
-          Sentry.captureMessage('🔍 Testing Sentry integration', 'debug');
-          addLog(setLogs, '🔍 Sent debug message to Sentry');
+          // Add proper error handling for each Sentry call
+          try {
+            Sentry.captureMessage('🔍 Testing Sentry integration', 'debug');
+            addLog(setLogs, '🔍 Sent debug message to Sentry');
+          } catch (sentryError) {
+            console.log('❌ Sentry captureMessage failed:', sentryError);
+            addLog(setLogs, `❌ Sentry captureMessage failed: ${sentryError}`);
+          }
           
           // Set user context
-          Sentry.setUser({ id: 'test-user', email: 'test@example.com' });
-          addLog(setLogs, '👤 Set user context in Sentry');
+          try {
+            Sentry.setUser({ id: 'test-user', email: 'test@example.com' });
+            addLog(setLogs, '👤 Set user context in Sentry');
+          } catch (sentryError) {
+            console.log('❌ Sentry setUser failed:', sentryError);
+            addLog(setLogs, `❌ Sentry setUser failed: ${sentryError}`);
+          }
           
           // Set extra context
-          Sentry.setExtra('app_version', '1.0.1');
-          Sentry.setExtra('build_number', '49');
-          addLog(setLogs, '📋 Set extra context in Sentry');
+          try {
+            Sentry.setExtra('app_version', '1.0.1');
+            Sentry.setExtra('build_number', '49');
+            addLog(setLogs, '📋 Set extra context in Sentry');
+          } catch (sentryError) {
+            console.log('❌ Sentry setExtra failed:', sentryError);
+            addLog(setLogs, `❌ Sentry setExtra failed: ${sentryError}`);
+          }
           
           // Send a breadcrumb
-          Sentry.addBreadcrumb({
-            category: 'app',
-            message: 'App initialization started',
-            level: 'info',
-          });
-          addLog(setLogs, '🍞 Added breadcrumb to Sentry');
+          try {
+            Sentry.addBreadcrumb({
+              category: 'app',
+              message: 'App initialization started',
+              level: 'info',
+            });
+            addLog(setLogs, '🍞 Added breadcrumb to Sentry');
+          } catch (sentryError) {
+            console.log('❌ Sentry addBreadcrumb failed:', sentryError);
+            addLog(setLogs, `❌ Sentry addBreadcrumb failed: ${sentryError}`);
+          }
           
         } catch (eventError) {
           console.log('❌ Failed to send additional Sentry events:', eventError);
@@ -311,7 +350,12 @@ function App() {
           addLog(setLogs, '📱 Checking environment variables...');
           try {
             await new Promise(resolve => setTimeout(resolve, 50));
-            Sentry.captureMessage('📱 Checking environment variables...', 'info');
+            try {
+              Sentry.captureMessage('📱 Checking environment variables...', 'info');
+            } catch (sentryError) {
+              console.log('❌ Sentry captureMessage failed:', sentryError);
+              addLog(setLogs, `❌ Sentry captureMessage failed: ${sentryError}`);
+            }
           } catch (error) {
             console.log('❌ Environment check Sentry message failed:', error);
           }
@@ -342,23 +386,32 @@ function App() {
         console.log('⏳ Starting delay...');
         addLog(setLogs, '⏳ Waiting for initialization...');
         
-        try {
-          console.log('📤 Sending waiting message...');
-          addLog(setLogs, '🔍 Attempting to send waiting message to Sentry...');
-          try {
-            await new Promise(resolve => setTimeout(resolve, 50));
-            Sentry.captureMessage('⏳ Waiting for initialization...', 'info');
-            console.log('✅ Waiting message sent');
-            addLog(setLogs, '✅ Waiting message sent to Sentry successfully');
-          } catch (error) {
-            console.log('❌ Waiting message failed:', error);
-            addLog(setLogs, `❌ Waiting message failed: ${error}`);
+                  try {
+            console.log('📤 Sending waiting message...');
+            addLog(setLogs, '🔍 Attempting to send waiting message to Sentry...');
+            try {
+              await new Promise(resolve => setTimeout(resolve, 50));
+              try {
+                Sentry.captureMessage('⏳ Waiting for initialization...', 'info');
+                console.log('✅ Waiting message sent');
+                addLog(setLogs, '✅ Waiting message sent to Sentry successfully');
+              } catch (sentryError) {
+                console.log('❌ Sentry captureMessage failed:', sentryError);
+                addLog(setLogs, `❌ Sentry captureMessage failed: ${sentryError}`);
+              }
+            } catch (error) {
+              console.log('❌ Waiting message failed:', error);
+              addLog(setLogs, `❌ Waiting message failed: ${error}`);
+            }
+          } catch (sentryError) {
+            console.log('❌ Waiting message error:', sentryError);
+            addLog(setLogs, `❌ Waiting message failed: ${sentryError}`);
+            try {
+              Sentry.captureException(sentryError);
+            } catch (captureError) {
+              console.log('❌ Sentry captureException failed:', captureError);
+            }
           }
-        } catch (sentryError) {
-          console.log('❌ Waiting message error:', sentryError);
-          addLog(setLogs, `❌ Waiting message failed: ${sentryError}`);
-          Sentry.captureException(sentryError);
-        }
         
         console.log('⏳ Waiting 1 second...');
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -404,9 +457,14 @@ function App() {
           addLog(setLogs, '🔍 Attempting to send Sentry message...');
           // Add delay to prevent overwhelming Sentry
           await new Promise(resolve => setTimeout(resolve, 100));
-          Sentry.captureMessage('✅ App initialization completed', 'info');
-          console.log('✅ Completion message sent');
-          addLog(setLogs, '✅ Sentry message sent successfully');
+          try {
+            Sentry.captureMessage('✅ App initialization completed', 'info');
+            console.log('✅ Completion message sent');
+            addLog(setLogs, '✅ Sentry message sent successfully');
+          } catch (sentryError) {
+            console.log('❌ Sentry captureMessage failed:', sentryError);
+            addLog(setLogs, `❌ Sentry captureMessage failed: ${sentryError}`);
+          }
         } catch (sentryError) {
           console.log('❌ Completion message error:', sentryError);
           addLog(setLogs, `❌ Sentry message failed: ${sentryError}`);
