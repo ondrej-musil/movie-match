@@ -93,7 +93,7 @@ function App() {
             
             // Set extra context
             Sentry.setExtra('app_version', '1.0.1');
-            Sentry.setExtra('build_number', '46');
+            Sentry.setExtra('build_number', '47');
             addLog('📋 Set extra context in Sentry');
             
             // Send a breadcrumb
