@@ -57,7 +57,6 @@ function App() {
 
   // Add immediate log to see if logging works
   console.log('📝 Testing immediate logging...');
-  addLog('🚀 App component function reached');
   console.log('✅ Immediate logging test completed');
 
   // Function to send automatic Sentry events on every app launch
@@ -222,6 +221,9 @@ function App() {
   useEffect(() => {
     console.log('🔧 useEffect triggered');
     addLog('🔧 useEffect triggered');
+    
+    // Add the immediate log here instead of during render
+    addLog('🚀 App component function reached');
     
     const initializeApp = async () => {
       console.log('🚀 initializeApp function called');
@@ -461,12 +463,7 @@ function App() {
           }
         }, 15000); // 15 second emergency fallback
 
-        // Add a simple bypass test - force ready after 5 seconds for testing
-        setTimeout(() => {
-          console.log('🧪 TEST: Forcing isReady to true after 5 seconds for testing');
-          addLog('🧪 TEST: Forcing isReady to true after 5 seconds for testing');
-          setIsReady(true);
-        }, 5000); // 5 second test bypass
+          // Test bypass removed - fixed the infinite re-render issue
       } catch (err) {
         console.log('❌ Main error in initializeApp:', err);
         addLog(`❌ App initialization error: ${err}`);
