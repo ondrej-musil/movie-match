@@ -157,25 +157,49 @@ function App() {
         try {
           console.log('📡 Calling Sentry.init...');
           Sentry.init({
-            dsn: 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/4509841326211152',
+            dsn: 'https://8098766737acb190f51b8ecf8f349cb3@4509841318608896.ingest.de.sentry.io/4509841326211152',
             sendDefaultPii: true,
             replaysSessionSampleRate: 0.1,
             replaysOnErrorSampleRate: 1,
             integrations: [Sentry.mobileReplayIntegration()],
+            // Add error handling and rate limiting
+            beforeSend: (event) => {
+              console.log('📤 Sentry beforeSend:', event.message);
+              return event;
+            },
+            beforeBreadcrumb: (breadcrumb) => {
+              console.log('🍞 Sentry breadcrumb:', breadcrumb.message);
+              return breadcrumb;
+            },
+            // Add debugging
+            debug: true,
+            // Use default React Native transport
           });
           console.log('✅ Sentry.init completed');
           addLog('✅ Sentry initialized successfully');
           
-          // Send automatic Sentry event on every app launch
+          // Send automatic Sentry event on every app launch with error handling
           console.log('📤 Sending automatic Sentry event...');
-          await sendAutomaticSentryEvent();
-          console.log('✅ Automatic Sentry event sent');
+          try {
+            await sendAutomaticSentryEvent();
+            console.log('✅ Automatic Sentry event sent');
+          } catch (error) {
+            console.log('❌ Automatic Sentry event failed:', error);
+            addLog(`❌ Automatic Sentry event failed: ${error}`);
+          }
           
-          // Test Sentry immediately to verify it's working
+          // Test Sentry with error handling and delay
           console.log('📤 Sending test message to Sentry...');
-          Sentry.captureMessage('🚀 App started successfully', 'info');
-          console.log('✅ Test message sent');
-          addLog('📤 Sent test message to Sentry');
+          try {
+            // Add small delay to prevent overwhelming Sentry
+            await new Promise(resolve => setTimeout(resolve, 100));
+            Sentry.captureMessage('🚀 App started successfully', 'info');
+            console.log('✅ Test message sent');
+            addLog('📤 Sent test message to Sentry');
+          } catch (error) {
+            console.log('❌ Test message failed:', error);
+            addLog(`❌ Test message failed: ${error}`);
+          }
           
           // Send additional automatic events to ensure Sentry is working
           try {
@@ -219,7 +243,12 @@ function App() {
           
           // Check if environment variables are loaded
           addLog('📱 Checking environment variables...');
-          Sentry.captureMessage('📱 Checking environment variables...', 'info');
+          try {
+            await new Promise(resolve => setTimeout(resolve, 50));
+            Sentry.captureMessage('📱 Checking environment variables...', 'info');
+          } catch (error) {
+            console.log('❌ Environment check Sentry message failed:', error);
+          }
           
           envCheck = {
             hasOpenAI: !!process.env.EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY,
@@ -250,9 +279,15 @@ function App() {
         try {
           console.log('📤 Sending waiting message...');
           addLog('🔍 Attempting to send waiting message to Sentry...');
-          Sentry.captureMessage('⏳ Waiting for initialization...', 'info');
-          console.log('✅ Waiting message sent');
-          addLog('✅ Waiting message sent to Sentry successfully');
+          try {
+            await new Promise(resolve => setTimeout(resolve, 50));
+            Sentry.captureMessage('⏳ Waiting for initialization...', 'info');
+            console.log('✅ Waiting message sent');
+            addLog('✅ Waiting message sent to Sentry successfully');
+          } catch (error) {
+            console.log('❌ Waiting message failed:', error);
+            addLog(`❌ Waiting message failed: ${error}`);
+          }
         } catch (sentryError) {
           console.log('❌ Waiting message error:', sentryError);
           addLog(`❌ Waiting message failed: ${sentryError}`);
@@ -269,6 +304,8 @@ function App() {
         // Send final automatic Sentry event to confirm successful launch
         try {
           console.log('📤 Sending final automatic Sentry event...');
+          // Add delay to prevent overwhelming Sentry
+          await new Promise(resolve => setTimeout(resolve, 100));
           await sendAutomaticSentryEvent();
           console.log('✅ Final automatic Sentry event sent');
           addLog('✅ Final automatic Sentry event sent');
@@ -281,13 +318,16 @@ function App() {
         try {
           console.log('📤 Sending completion message...');
           addLog('🔍 Attempting to send Sentry message...');
+          // Add delay to prevent overwhelming Sentry
+          await new Promise(resolve => setTimeout(resolve, 100));
           Sentry.captureMessage('✅ App initialization completed', 'info');
           console.log('✅ Completion message sent');
           addLog('✅ Sentry message sent successfully');
         } catch (sentryError) {
           console.log('❌ Completion message error:', sentryError);
           addLog(`❌ Sentry message failed: ${sentryError}`);
-          Sentry.captureException(sentryError);
+          // Don't call captureException here as it might cause another crash
+          console.log('⚠️ Skipping Sentry.captureException to prevent crash loop');
         }
         
         try {
