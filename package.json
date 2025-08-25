@@ -6,7 +6,13 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build:android": "eas build --platform android --profile production",
+    "build:ios": "eas build --platform ios --profile production",
+    "build:both": "eas build --platform all --profile production",
+    "sentry:upload-sourcemaps": "sentry-cli releases files VERSION upload-sourcemaps ./dist --dist DISTRIBUTION",
+    "sentry:create-release": "sentry-cli releases new VERSION",
+    "sentry:finalize-release": "sentry-cli releases finalize VERSION"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

@@ -52,11 +52,11 @@
       [
         "@sentry/react-native/expo",
         {
-          "url": "https://sentry.io/",
-          "project": "movie-match.cz",
-          "organization": "movie-matchcz",
-          "disableAutoUpload": true,
-          "uploadSourceMaps": false
+          "url": "https://de.sentry.io/",
+          "project": "4509841326211152",
+          "organization": "4509841318608896",
+          "disableAutoUpload": false,
+          "uploadSourceMaps": true
         }
       ]
     ]
