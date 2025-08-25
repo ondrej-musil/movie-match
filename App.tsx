@@ -7,6 +7,21 @@ import { View, Text, Button, Platform } from "react-native";
 import AppNavigator from "./src/navigation/AppNavigator";
 import * as Sentry from "@sentry/react-native";
 
+// Initialize Sentry immediately to prevent "wrap before init" errors
+Sentry.init({
+  dsn: 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/4509841326211152',
+  sendDefaultPii: true,
+  // React Native specific configuration
+  enableNative: false,
+  enableNativeCrashHandling: false,
+  enableNativeNagger: false,
+  // Disable features that require native integration
+  enableAutoSessionTracking: false,
+  attachStacktrace: true,
+  // Reduce debug noise
+  debug: false,
+});
+
 /*
 IMPORTANT NOTICE: DO NOT REMOVE
 There are already environment keys in the project. 
@@ -59,7 +74,7 @@ const sendAutomaticSentryEvent = async (setLogs: React.Dispatch<React.SetStateAc
       tags: {
         event_type: 'app_launch',
         app_version: '1.0.1',
-                  build_number: '49',
+        build_number: '49',
         platform: 'react-native',
         timestamp: launchTime
       },
@@ -67,11 +82,11 @@ const sendAutomaticSentryEvent = async (setLogs: React.Dispatch<React.SetStateAc
         launch_time: launchTime,
         app_state: 'active',
         session_id: Date.now().toString(),
-                  device_info: {
-            platform: 'react-native',
-            version: '1.0.1',
-            build: '49'
-          }
+        device_info: {
+          platform: 'react-native',
+          version: '1.0.1',
+          build: '49'
+        }
       },
       contexts: {
         app: {
@@ -100,8 +115,8 @@ const sendAutomaticSentryEvent = async (setLogs: React.Dispatch<React.SetStateAc
     // Set additional context
     Sentry.setContext('app_launch', {
       timestamp: launchTime,
-              version: '1.0.1',
-        build: '49',
+      version: '1.0.1',
+      build: '49',
       platform: 'react-native',
       session_id: Date.now().toString()
     });
@@ -219,105 +234,69 @@ function App() {
       addLog(setLogs, '🚀 initializeApp function called');
       try {
         console.log('📝 Adding first log...');
-        addLog(setLogs, '�� App initialization started');
+        addLog(setLogs, '🚀 App initialization started');
         console.log('✅ First log added successfully');
         
         // Add mobile-specific debugging
         console.log('📱 Adding mobile debug info...');
         addMobileDebugInfo(setLogs);
         
-        // Initialize Sentry first
-        console.log('🔧 Starting Sentry initialization...');
-        addLog(setLogs, '🔧 Initializing Sentry...');
+        // Sentry is already initialized at the top level
+        console.log('🔧 Sentry already initialized, proceeding with setup...');
+        addLog(setLogs, '🔧 Sentry already initialized, proceeding with setup...');
+        
+        // Test network connectivity to Sentry
+        console.log('🌐 Testing Sentry network connectivity...');
+        await testSentryConnectivity(setLogs);
+        
+        // Send automatic Sentry event on every app launch with error handling
+        console.log('📤 Sending automatic Sentry event...');
         try {
-          console.log('📡 Calling Sentry.init...');
-          Sentry.init({
-            dsn: 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/4509841326211152',
-            sendDefaultPii: true,
-            // React Native specific configuration
-            enableNative: false,
-            enableNativeCrashHandling: false,
-            enableNativeNagger: false,
-            // Disable features that require native integration
-            enableAutoSessionTracking: false,
-            attachStacktrace: true,
-            // Add error handling and rate limiting
-            beforeSend: (event) => {
-              console.log('📤 Sentry beforeSend:', event.message);
-              return event;
-            },
-            beforeBreadcrumb: (breadcrumb) => {
-              console.log('🍞 Sentry breadcrumb:', breadcrumb.message);
-              return breadcrumb;
-            },
-            // Reduce debug noise
-            debug: false,
-            // Use default React Native transport
+          await sendAutomaticSentryEvent(setLogs);
+          console.log('✅ Automatic Sentry event sent');
+        } catch (error) {
+          console.log('❌ Automatic Sentry event failed:', error);
+          addLog(setLogs, `❌ Automatic Sentry event failed: ${error}`);
+        }
+        
+        // Test Sentry with error handling and delay
+        console.log('📤 Sending test message to Sentry...');
+        try {
+          // Add small delay to prevent overwhelming Sentry
+          await new Promise(resolve => setTimeout(resolve, 100));
+          Sentry.captureMessage('🚀 App started successfully', 'info');
+          console.log('✅ Test message sent');
+          addLog(setLogs, '📤 Sent test message to Sentry');
+        } catch (error) {
+          console.log('❌ Test message failed:', error);
+          addLog(setLogs, `❌ Test message failed: ${error}`);
+        }
+        
+        // Send additional automatic events to ensure Sentry is working
+        try {
+          Sentry.captureMessage('🔍 Testing Sentry integration', 'debug');
+          addLog(setLogs, '🔍 Sent debug message to Sentry');
+          
+          // Set user context
+          Sentry.setUser({ id: 'test-user', email: 'test@example.com' });
+          addLog(setLogs, '👤 Set user context in Sentry');
+          
+          // Set extra context
+          Sentry.setExtra('app_version', '1.0.1');
+          Sentry.setExtra('build_number', '49');
+          addLog(setLogs, '📋 Set extra context in Sentry');
+          
+          // Send a breadcrumb
+          Sentry.addBreadcrumb({
+            category: 'app',
+            message: 'App initialization started',
+            level: 'info',
           });
-          console.log('✅ Sentry.init completed');
-          addLog(setLogs, '✅ Sentry initialized successfully');
+          addLog(setLogs, '🍞 Added breadcrumb to Sentry');
           
-          // Now that Sentry is initialized, wrap the app
-          console.log('🔧 Wrapping app with Sentry...');
-          addLog(setLogs, '🔧 Wrapping app with Sentry...');
-          
-          // Test network connectivity to Sentry
-          console.log('🌐 Testing Sentry network connectivity...');
-          await testSentryConnectivity(setLogs);
-          
-          // Send automatic Sentry event on every app launch with error handling
-          console.log('📤 Sending automatic Sentry event...');
-          try {
-            await sendAutomaticSentryEvent(setLogs);
-            console.log('✅ Automatic Sentry event sent');
-          } catch (error) {
-            console.log('❌ Automatic Sentry event failed:', error);
-            addLog(setLogs, `❌ Automatic Sentry event failed: ${error}`);
-          }
-          
-          // Test Sentry with error handling and delay
-          console.log('📤 Sending test message to Sentry...');
-          try {
-            // Add small delay to prevent overwhelming Sentry
-            await new Promise(resolve => setTimeout(resolve, 100));
-            Sentry.captureMessage('🚀 App started successfully', 'info');
-            console.log('✅ Test message sent');
-            addLog(setLogs, '📤 Sent test message to Sentry');
-          } catch (error) {
-            console.log('❌ Test message failed:', error);
-            addLog(setLogs, `❌ Test message failed: ${error}`);
-          }
-          
-          // Send additional automatic events to ensure Sentry is working
-          try {
-            Sentry.captureMessage('🔍 Testing Sentry integration', 'debug');
-            addLog(setLogs, '�� Sent debug message to Sentry');
-            
-            // Set user context
-            Sentry.setUser({ id: 'test-user', email: 'test@example.com' });
-            addLog(setLogs, '👤 Set user context in Sentry');
-            
-            // Set extra context
-            Sentry.setExtra('app_version', '1.0.1');
-                          Sentry.setExtra('build_number', '49');
-            addLog(setLogs, '📋 Set extra context in Sentry');
-            
-            // Send a breadcrumb
-            Sentry.addBreadcrumb({
-              category: 'app',
-              message: 'App initialization started',
-              level: 'info',
-            });
-            addLog(setLogs, '🍞 Added breadcrumb to Sentry');
-            
-          } catch (eventError) {
-            console.log('❌ Failed to send additional Sentry events:', eventError);
-            addLog(setLogs, `❌ Failed to send additional Sentry events: ${eventError}`);
-          }
-        } catch (sentryError) {
-          console.log('❌ Sentry error:', sentryError);
-          addLog(setLogs, `❌ Sentry initialization failed: ${sentryError}`);
-          Sentry.captureException(sentryError);
+        } catch (eventError) {
+          console.log('❌ Failed to send additional Sentry events:', eventError);
+          addLog(setLogs, `❌ Failed to send additional Sentry events: ${eventError}`);
         }
         
         console.log('📱 About to check environment variables...');
@@ -460,7 +439,7 @@ function App() {
           }
         }, 15000); // 15 second emergency fallback
 
-          // Test bypass removed - fixed the infinite re-render issue
+        // Test bypass removed - fixed the infinite re-render issue
       } catch (err) {
         console.log('❌ Main error in initializeApp:', err);
         addLog(setLogs, `❌ App initialization error: ${err}`);
@@ -541,8 +520,6 @@ function App() {
     );
   }
 
-
-  
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
@@ -555,5 +532,5 @@ function App() {
   );
 }
 
-// Export the unwrapped app - we'll wrap it after initialization
-export default App;
+// Wrap the app with Sentry
+export default Sentry.wrap(App);
