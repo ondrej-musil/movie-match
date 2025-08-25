@@ -142,6 +142,41 @@ function App() {
     }
   };
 
+  // Function to test network connectivity to Sentry
+  const testSentryConnectivity = async () => {
+    try {
+      console.log('🌐 Testing Sentry network connectivity...');
+      addLog('🌐 Testing Sentry network connectivity...');
+      
+      // Test basic network connectivity
+      const testUrl = 'https://de.sentry.io/';
+      const response = await fetch(testUrl, { method: 'HEAD' });
+      console.log('✅ Network test successful:', response.status);
+      addLog(`✅ Network test successful: ${response.status}`);
+      
+      // Test Sentry ingest endpoint
+      const ingestUrl = 'https://8098766737acb190f51b8ecf8f349cb3@o4509841318608896.ingest.de.sentry.io/api/4509841326211152/store/';
+      const ingestResponse = await fetch(ingestUrl, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'Network test' })
+      });
+      console.log('✅ Ingest endpoint test:', ingestResponse.status);
+      addLog(`✅ Ingest endpoint test: ${ingestResponse.status}`);
+      
+    } catch (error) {
+      console.log('❌ Network test failed:', error);
+      addLog(`❌ Network test failed: ${error}`);
+      
+      // Try to send this error to Sentry
+      try {
+        Sentry.captureMessage(`Network connectivity test failed: ${error}`, 'error');
+      } catch (sentryError) {
+        console.log('❌ Could not send network error to Sentry:', sentryError);
+      }
+    }
+  };
+
   useEffect(() => {
     console.log('🔧 useEffect triggered');
     const initializeApp = async () => {
@@ -177,6 +212,10 @@ function App() {
           });
           console.log('✅ Sentry.init completed');
           addLog('✅ Sentry initialized successfully');
+          
+          // Test network connectivity to Sentry
+          console.log('🌐 Testing Sentry network connectivity...');
+          await testSentryConnectivity();
           
           // Send automatic Sentry event on every app launch with error handling
           console.log('📤 Sending automatic Sentry event...');
@@ -372,6 +411,16 @@ function App() {
           }}
           color="white"
         />
+        <View style={{ marginTop: 10 }}>
+          <Button 
+            title="Test Network to Sentry" 
+            onPress={async () => { 
+              console.log('🌐 Manual network test triggered');
+              await testSentryConnectivity();
+            }}
+            color="white"
+          />
+        </View>
       </View>
     );
   }
