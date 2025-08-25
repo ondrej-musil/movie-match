@@ -203,20 +203,9 @@ const addMobileDebugInfo = (setLogs: React.Dispatch<React.SetStateAction<string[
 };
 
 function App() {
-  console.log('🚀 App component rendering...');
-  
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
-
-  console.log('📱 State initialized - isReady:', isReady, 'error:', error);
-
-  // Add immediate logging to see if we even get here
-  console.log('🔍 App function reached - adding immediate log');
-  
-  // Add immediate log to see if logging works
-  console.log('📝 Testing immediate logging...');
-  console.log('✅ Immediate logging test completed');
 
   useEffect(() => {
     console.log('🔧 useEffect triggered');
@@ -479,8 +468,6 @@ function App() {
   }, []);
 
   if (!isReady) {
-    console.log('🔄 Showing loading screen');
-    addLog(setLogs, '🔄 Showing loading screen');
     return (
       <View style={{ flex: 1, backgroundColor: '#D32F2F', justifyContent: 'center', alignItems: 'center' }}>
         <Text style={{ color: 'white', fontSize: 18 }}>Loading...</Text>
@@ -509,7 +496,6 @@ function App() {
   }
 
   if (error) {
-    console.log('❌ Showing error screen:', error);
     return (
       <View style={{ flex: 1, backgroundColor: '#D32F2F', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
         <Text style={{ color: 'white', fontSize: 18, textAlign: 'center' }}>
@@ -547,17 +533,7 @@ function App() {
     );
   }
 
-  console.log('🎬 Rendering main app');
-  addLog(setLogs, '🎬 Rendering main app');
-  
-  // Add a simple test to see if we can even render basic components
-  try {
-    console.log('🧪 Testing basic component rendering...');
-    addLog(setLogs, '🧪 Testing basic component rendering...');
-  } catch (renderError) {
-    console.log('❌ Render test failed:', renderError);
-    addLog(setLogs, `❌ Render test failed: ${renderError}`);
-  }
+
   
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
