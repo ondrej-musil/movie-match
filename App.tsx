@@ -52,6 +52,96 @@ function App() {
     }
   };
 
+  // Function to send automatic Sentry events on every app launch
+  const sendAutomaticSentryEvent = async () => {
+    try {
+      console.log('📤 Sending automatic Sentry event...');
+      addLog('📤 Sending automatic Sentry event...');
+      
+      // Get current timestamp
+      const launchTime = new Date().toISOString();
+      
+      // Send main app launch event
+      Sentry.captureEvent({
+        message: '🚀 App Launched Successfully',
+        level: 'info',
+        tags: {
+          event_type: 'app_launch',
+          app_version: '1.0.1',
+          build_number: '47',
+          platform: 'react-native',
+          timestamp: launchTime
+        },
+        extra: {
+          launch_time: launchTime,
+          app_state: 'active',
+          session_id: Date.now().toString(),
+          device_info: {
+            platform: 'react-native',
+            version: '1.0.1',
+            build: '47'
+          }
+        },
+        contexts: {
+          app: {
+            app_version: '1.0.1',
+            build: '47',
+            name: '2-movie-match'
+          },
+          device: {
+            name: 'react-native',
+            version: '1.0.1'
+          }
+        }
+      });
+      
+      // Send additional context information
+      Sentry.setTag('app_launch_count', 'incremental');
+      Sentry.setTag('last_launch_time', launchTime);
+      
+      // Set user context for tracking
+      Sentry.setUser({
+        id: 'app-user',
+        username: 'movie-match-user',
+        email: 'user@moviematch.cz'
+      });
+      
+      // Set additional context
+      Sentry.setContext('app_launch', {
+        timestamp: launchTime,
+        version: '1.0.1',
+        build: '47',
+        platform: 'react-native',
+        session_id: Date.now().toString()
+      });
+      
+      // Send a breadcrumb for the launch
+      Sentry.addBreadcrumb({
+        category: 'app',
+        message: 'App launched successfully',
+        level: 'info',
+        data: {
+          launch_time: launchTime,
+          version: '1.0.1',
+          build: '47'
+        }
+      });
+      
+      console.log('✅ Automatic Sentry event sent successfully');
+      addLog('✅ Automatic Sentry event sent successfully');
+      
+    } catch (error) {
+      console.log('❌ Failed to send automatic Sentry event:', error);
+      addLog(`❌ Failed to send automatic Sentry event: ${error}`);
+      // Try to capture the error itself
+      try {
+        Sentry.captureException(error);
+      } catch (sentryError) {
+        console.log('❌ Failed to capture Sentry error:', sentryError);
+      }
+    }
+  };
+
   useEffect(() => {
     console.log('🔧 useEffect triggered');
     const initializeApp = async () => {
@@ -75,6 +165,11 @@ function App() {
           });
           console.log('✅ Sentry.init completed');
           addLog('✅ Sentry initialized successfully');
+          
+          // Send automatic Sentry event on every app launch
+          console.log('📤 Sending automatic Sentry event...');
+          await sendAutomaticSentryEvent();
+          console.log('✅ Automatic Sentry event sent');
           
           // Test Sentry immediately to verify it's working
           console.log('📤 Sending test message to Sentry...');
@@ -170,6 +265,17 @@ function App() {
         
         console.log('✅ Setting app initialization completed...');
         addLog('✅ App initialization completed');
+        
+        // Send final automatic Sentry event to confirm successful launch
+        try {
+          console.log('📤 Sending final automatic Sentry event...');
+          await sendAutomaticSentryEvent();
+          console.log('✅ Final automatic Sentry event sent');
+          addLog('✅ Final automatic Sentry event sent');
+        } catch (error) {
+          console.log('❌ Failed to send final automatic Sentry event:', error);
+          addLog(`❌ Failed to send final automatic Sentry event: ${error}`);
+        }
         
         // Add specific error handling to pinpoint the crash
         try {
