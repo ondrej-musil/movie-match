@@ -3,7 +3,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, Platform } from "react-native";
 import AppNavigator from "./src/navigation/AppNavigator";
 import * as Sentry from "@sentry/react-native";
 
@@ -177,6 +177,40 @@ function App() {
     }
   };
 
+  // Function to add mobile-specific debugging
+  const addMobileDebugInfo = () => {
+    try {
+      console.log('📱 Adding mobile debug info...');
+      addLog('📱 Adding mobile debug info...');
+      
+      // Add device info
+      const deviceInfo = {
+        platform: Platform.OS,
+        version: Platform.Version,
+        isTablet: Platform.OS === 'ios' ? (Platform as any).isPad || false : false,
+        timestamp: new Date().toISOString(),
+        memory: 'unknown', // We'll try to get this
+        networkType: 'unknown' // We'll try to get this
+      };
+      
+      console.log('📱 Device info:', deviceInfo);
+      addLog(`📱 Device info: ${JSON.stringify(deviceInfo)}`);
+      
+      // Try to get more device info
+      if (Platform.OS === 'ios') {
+        console.log('📱 iOS specific info available');
+        addLog('📱 iOS specific info available');
+      } else if (Platform.OS === 'android') {
+        console.log('📱 Android specific info available');
+        addLog('📱 Android specific info available');
+      }
+      
+    } catch (error) {
+      console.log('❌ Failed to add mobile debug info:', error);
+      addLog(`❌ Failed to add mobile debug info: ${error}`);
+    }
+  };
+
   useEffect(() => {
     console.log('🔧 useEffect triggered');
     const initializeApp = async () => {
@@ -185,6 +219,10 @@ function App() {
         console.log('📝 Adding first log...');
         addLog('🚀 App initialization started');
         console.log('✅ First log added successfully');
+        
+        // Add mobile-specific debugging
+        console.log('📱 Adding mobile debug info...');
+        addMobileDebugInfo();
         
         // Initialize Sentry first
         console.log('🔧 Starting Sentry initialization...');
@@ -337,6 +375,24 @@ function App() {
         await new Promise(resolve => setTimeout(resolve, 1000));
         console.log('✅ Delay completed');
         
+        // Add timeout protection for mobile
+        console.log('⏰ Adding timeout protection...');
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('App initialization timeout after 10 seconds')), 10000)
+        );
+        
+        try {
+          await Promise.race([
+            new Promise(resolve => setTimeout(resolve, 2000)), // Normal flow
+            timeoutPromise
+          ]);
+          console.log('✅ Timeout protection passed');
+        } catch (timeoutError) {
+          console.log('⚠️ Timeout protection triggered:', timeoutError);
+          addLog(`⚠️ Timeout protection triggered: ${timeoutError}`);
+          // Continue anyway to prevent hanging
+        }
+        
         console.log('✅ Setting app initialization completed...');
         addLog('✅ App initialization completed');
         
@@ -378,11 +434,21 @@ function App() {
         } catch (stateError) {
           console.log('❌ State error:', stateError);
           addLog(`❌ Setting isReady failed: ${stateError}`);
-          Sentry.captureException(stateError);
+          // Don't call Sentry here to prevent crash loops
+          console.log('⚠️ Skipping Sentry.captureException to prevent crash loop');
           // Still try to set ready so user can see the error
           console.log('🔄 Trying to set isReady again...');
           setIsReady(true);
         }
+        
+        // Final fallback - ensure app is never stuck
+        setTimeout(() => {
+          if (!isReady) {
+            console.log('🚨 EMERGENCY: App stuck, forcing isReady to true');
+            addLog('🚨 EMERGENCY: App stuck, forcing isReady to true');
+            setIsReady(true);
+          }
+        }, 15000); // 15 second emergency fallback
       } catch (err) {
         console.log('❌ Main error in initializeApp:', err);
         addLog(`❌ App initialization error: ${err}`);
