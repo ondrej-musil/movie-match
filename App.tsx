@@ -59,7 +59,7 @@ const sendAutomaticSentryEvent = async (setLogs: React.Dispatch<React.SetStateAc
       tags: {
         event_type: 'app_launch',
         app_version: '1.0.1',
-        build_number: '47',
+                  build_number: '49',
         platform: 'react-native',
         timestamp: launchTime
       },
@@ -67,16 +67,16 @@ const sendAutomaticSentryEvent = async (setLogs: React.Dispatch<React.SetStateAc
         launch_time: launchTime,
         app_state: 'active',
         session_id: Date.now().toString(),
-        device_info: {
-          platform: 'react-native',
-          version: '1.0.1',
-          build: '47'
-        }
+                  device_info: {
+            platform: 'react-native',
+            version: '1.0.1',
+            build: '49'
+          }
       },
       contexts: {
         app: {
           app_version: '1.0.1',
-          build: '47',
+          build: '49',
           name: '2-movie-match'
         },
         device: {
@@ -100,8 +100,8 @@ const sendAutomaticSentryEvent = async (setLogs: React.Dispatch<React.SetStateAc
     // Set additional context
     Sentry.setContext('app_launch', {
       timestamp: launchTime,
-      version: '1.0.1',
-      build: '47',
+              version: '1.0.1',
+        build: '49',
       platform: 'react-native',
       session_id: Date.now().toString()
     });
@@ -114,7 +114,7 @@ const sendAutomaticSentryEvent = async (setLogs: React.Dispatch<React.SetStateAc
       data: {
         launch_time: launchTime,
         version: '1.0.1',
-        build: '47'
+        build: '49'
       }
     });
     
@@ -302,7 +302,7 @@ function App() {
             
             // Set extra context
             Sentry.setExtra('app_version', '1.0.1');
-            Sentry.setExtra('build_number', '47');
+                          Sentry.setExtra('build_number', '49');
             addLog(setLogs, '📋 Set extra context in Sentry');
             
             // Send a breadcrumb
